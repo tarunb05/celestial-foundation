@@ -180,8 +180,8 @@ function fillPanel(i) {
 
 $('#workList').innerHTML = projects
   .map(
-    (p, i) => `<li class="wlist"><a href="${p.link || p.gallery[0]}" target="_blank" rel="noopener">
-      <img src="${p.gallery[0]}" alt="${p.title}" loading="lazy" />
+    (p, i) => `<li class="wlist"><a href="${p.link || p.gallery[0] || '#work'}" target="_blank" rel="noopener">
+      <img src="${p.gallery[0] || '/img/logo.png'}" alt="${p.title}" loading="lazy" />
       <span class="wlist__num">${pad(i + 1)}</span>
       <span class="wlist__meta">${[p.date, p.place].filter(Boolean).join(' · ')}</span>
       <span class="wlist__title">${p.title}</span>

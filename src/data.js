@@ -39,16 +39,31 @@ export const projects = [
     planet: { a: '#0d1c42', b: '#8fa6dd', c: '#fcf1d0', bands: 0, size: 0.48 },
   },
 
+  {
+    title: 'Jakkur Government School',
+    date: 'Independence Day',
+    place: 'Independence Day Celebration',
+    partner: 'Jakkur, Bangalore',
+    desc: 'We celebrated Independence Day alongside students at Jakkur Government School, taking part in the march past and joining the children in various activities, including singing and dancing. As part of the initiative, we distributed file binders, stationery kits and books to approximately 120 students, combining the spirit of celebration with a contribution towards their education.',
+    did: [
+      'Took part in the Independence Day march past with the students',
+      'Joined the children in singing, dancing and other activities',
+      'Distributed file binders, stationery kits and books',
+    ],
+    impact: [{ value: '~120', label: 'students reached' }],
+    gallery: [], // photos to be added: jakkur-independence-day-*.jpg
+    planet: { a: '#1b3a8a', b: '#f2d58a', c: '#fcf1d0', bands: 1, size: 0.46 },
+  },
+
   // ---- Placeholders: empty orbits, filled in one by one ----
   ...[
-    { a: '#1b3a8a', b: '#7fb0ff', c: '#fcf1d0', bands: 0, size: 0.46 },
     { a: '#e8d6a6', b: '#fcf1d0', c: '#22396f', bands: 1, size: 0.6, ring: true },
     { a: '#22396f', b: '#b9c8ee', c: '#010736', bands: 1, size: 0.4 },
     { a: '#f2d58a', b: '#fcf1d0', c: '#22396f', bands: 0, size: 0.34 },
     { a: '#2a4a8f', b: '#a9c0f0', c: '#0d1c42', bands: 1, size: 0.46 },
     { a: '#c8a65e', b: '#f6e3b0', c: '#0d1c42', bands: 0, size: 0.38 },
     { a: '#5b6fae', b: '#dfe6ff', c: '#010736', bands: 1, size: 0.5 },
-  ].map((planet, k) => placeholder(`Project ${String(3 + k).padStart(2, '0')}`, planet)),
+  ].map((planet, k) => placeholder(`Project ${String(4 + k).padStart(2, '0')}`, planet)),
   // tiny moons for smaller projects (moonOf = index of the planet they circle)
   placeholder('Small project', { a: '#a9c0f0', b: '#fcf1d0', c: '#22396f', bands: 0, size: 0.13 }, 0),
   placeholder('Small project', { a: '#f2d58a', b: '#fcf1d0', c: '#22396f', bands: 0, size: 0.12 }, 3),
