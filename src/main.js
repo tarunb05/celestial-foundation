@@ -182,7 +182,7 @@ function fillPanel(i) {
     .map((s) => `<div class="stat ${s.value == null ? 'stat--empty' : ''}"><span class="stat__num">${s.value ?? '—'}</span><span class="stat__label">${s.label}</span></div>`)
     .join('')
   $('#plDid').innerHTML = p.did.map((d) => `<li>${d}</li>`).join('')
-  $('#plGallery').innerHTML = p.gallery.map((src) => `<a href="${p.link || src}" target="_blank" rel="noopener"><img src="${src}" alt="${p.title}" loading="lazy" /></a>`).join('')
+  $('#plGallery').innerHTML = p.gallery.map((src) => `<figure><img src="${src}" alt="${p.title}" loading="lazy" draggable="false" /></figure>`).join('') // photos are not links
   $('#plGallery').dataset.count = p.gallery.length
   $('#plLink').href = p.link || '#'
   $('#plLink').hidden = !p.link // no Instagram post yet → no button
@@ -194,12 +194,13 @@ function fillPanel(i) {
 
 $('#workList').innerHTML = projects
   .map(
-    (p, i) => `<li class="wlist"><a href="${p.link || p.gallery[0] || '#work'}" target="_blank" rel="noopener">
-      <img src="${p.gallery[0] || '/img/logo.png'}" alt="${p.title}" loading="lazy" />
+    (p, i) => `<li class="wlist"><div class="wlist__card">
+      <img src="${p.gallery[0] || '/img/logo.png'}" alt="${p.title}" loading="lazy" draggable="false" />
       <span class="wlist__num">${pad(i + 1)}</span>
       <span class="wlist__meta">${[p.date, p.place].filter(Boolean).join(' · ')}</span>
       <span class="wlist__title">${p.title}</span>
-      <span class="wlist__desc">${p.did.join(' · ')}</span></a></li>`
+      <span class="wlist__desc">${p.did.join(' · ')}</span>
+      ${p.link ? `<a class="planet__link" href="${p.link}" target="_blank" rel="noopener">View on Instagram</a>` : ''}</div></li>`
   )
   .join('')
 

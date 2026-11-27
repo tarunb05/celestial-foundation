@@ -500,11 +500,11 @@ html.has-asteroid * { cursor: none !important; }
 }
 .planet__gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 28px; }
 .planet__gallery[data-count='1'] { grid-template-columns: 1fr; }
-.planet__gallery a { border-radius: 14px; overflow: hidden; aspect-ratio: 4 / 5; }
-.planet__gallery[data-count='1'] a { aspect-ratio: 4 / 3; }
-.planet__gallery[data-count='3'] a:first-child { grid-column: 1 / -1; aspect-ratio: 4 / 3; } /* odd count: lead photo full width */
+.planet__gallery figure { margin: 0; border-radius: 14px; overflow: hidden; aspect-ratio: 4 / 5; }
+.planet__gallery[data-count='1'] figure { aspect-ratio: 4 / 3; }
+.planet__gallery[data-count='3'] figure:first-child { grid-column: 1 / -1; aspect-ratio: 4 / 3; } /* odd count: lead photo full width */
 .planet__gallery img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
-.planet__gallery a:hover img { transform: scale(1.06); }
+.planet__gallery img { pointer-events: none; user-select: none; }
 .planet--placeholder .planet__link, .planet--placeholder .planet__h, .planet--placeholder .planet__did, .planet--placeholder .planet__impact { display: none; }
 .planet__cta { display: none; margin-top: 26px; }
 .planet--placeholder .planet__cta { display: inline-flex; }
@@ -519,7 +519,7 @@ html.has-asteroid * { cursor: none !important; }
 .no-webgl .work__canvas, .no-webgl .work__labels, .no-webgl .work__center, .no-webgl .work__hint, .no-webgl .planet { display: none; }
 .no-webgl .work__head { position: static; padding: 0 var(--pad); }
 .no-webgl .work__list { display: grid; }
-.wlist a { display: grid; gap: 8px; }
+.wlist__card { display: grid; gap: 8px; }
 .wlist img { aspect-ratio: 4 / 5; object-fit: cover; border-radius: 14px; }
 .wlist__num { font-style: italic; color: var(--pink); }
 .wlist__meta { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.6; }
