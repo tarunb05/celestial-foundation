@@ -142,17 +142,19 @@ ScrollTrigger.create({ start: 80, onToggle: (s) => $('#nav').classList.toggle('n
 }
 
 /* ---------------- Reveals ---------------- */
-// count-up numbers ("1,800+") when they scroll into view
+// count-up numbers ("1,800+") when they scroll into view: the number grows as it counts,
+// overshoots a touch, then settles back with a little bounce
 $$('[data-count]').forEach((el) => {
   const end = +el.dataset.count
   const n = { v: 0 }
-  gsap.to(n, {
-    v: end,
-    duration: reduced ? 0 : 2,
-    ease: 'power2.out',
-    scrollTrigger: { trigger: el, start: 'top 85%', once: true },
-    onUpdate: () => (el.textContent = `${Math.round(n.v).toLocaleString('en-IN')}+`),
-  })
+  gsap.set(el, { display: 'inline-block', transformOrigin: 'left center' })
+  if (!reduced) el.textContent = '0+'
+  const tl = gsap.timeline({ paused: true })
+  tl.fromTo(el, { scale: 0.45, opacity: 0.2 }, { scale: 1.18, opacity: 1, duration: 1.6, ease: 'power2.out' }, 0)
+    .to(n, { v: end, duration: 1.8, ease: 'power3.out', onUpdate: () => (el.textContent = `${Math.round(n.v).toLocaleString('en-IN')}+`) }, 0)
+    .to(el, { scale: 1, duration: 0.9, ease: 'elastic.out(1, 0.45)' }, 1.6)
+  if (reduced) tl.progress(1)
+  else ScrollTrigger.create({ trigger: el, start: 'top 85%', once: true, onEnter: () => tl.play() })
 })
 $$('[data-reveal-words]').forEach((el) => {
   const words = el.textContent.trim().split(/\s+/)
