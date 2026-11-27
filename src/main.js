@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 import { projects, intents, PHONE } from './data.js'
 import { initHero } from './hero.js'
-import { initSystem } from './system.js'
+import { initSystem, planetNumber } from './system.js'
 import { initAsteroidCursor } from './cursor.js'
 import { initGalaxy } from './galaxy.js'
 
@@ -48,13 +48,15 @@ $$('a[href^="#"]').forEach((a) =>
   })
 )
 
+let heroApi = null // set once the hero scene exists; the loader exit flies its camera in
+
 /* ---------------- Loader → logo reveal ---------------- */
 {
   const countEl = $('#loaderCount')
   const fillEl = $('#loaderFill')
   gsap.set('#loaderName span', { yPercent: 110 })
   const galaxy = initGalaxy($('#loaderSky'), { reduced, center: $('#loaderMoon') })
-  gsap.fromTo(galaxy.state, { zoom: 0.6 }, { zoom: 1, duration: 2.2, ease: 'power3.out' }) // galaxy unfurls while loading
+  gsap.fromTo(galaxy.state, { zoom: 0.7 }, { zoom: 0.85, duration: 2.2, ease: 'power3.out' }) // sky drifts in while loading
   const ready = Promise.all([
     document.fonts.ready,
     new Promise((r) => (document.readyState === 'complete' ? r() : window.addEventListener('load', r, { once: true }))),
@@ -86,14 +88,20 @@ $$('a[href^="#"]').forEach((a) =>
     const tl = gsap.timeline()
     tl.to('#loaderCountWrap', { opacity: 0, y: 10, duration: 0.3 })
       .to('#loaderMoon', { scale: 1.9, duration: 0.9, ease: 'expo.inOut' }, '<')
-      .to(galaxy.state, { zoom: 1.35, duration: 1.8, ease: 'expo.inOut' }, '<') // the galaxy surges in with the logo
+      .to(galaxy.state, { zoom: 1.1, duration: 1.8, ease: 'expo.inOut' }, '<') // the sky surges in with the logo
       .fromTo('#loaderLogo', { opacity: 0, scale: 0.6, rotate: -25 }, { opacity: 1, scale: 1, rotate: 0, duration: 0.9, ease: 'expo.out' }, '-=0.45')
       .to('#loaderFill', { opacity: 0, duration: 0.4 }, '<0.2')
       .fromTo('#loaderName span', { yPercent: 110 }, { yPercent: 0, duration: 0.8, ease: 'expo.out' }, '<')
-      .to('#loader', { yPercent: -100, duration: 1.1, ease: 'expo.inOut', delay: reduced ? 0 : 0.7 })
-      .set('#loader', { display: 'none', onComplete: () => galaxy.stop() })
-      .from('.hero__title .line > span', { yPercent: 110, duration: 1.2, stagger: 0.12, ease: 'expo.out' }, '-=0.5')
-      .from('.hero__eyebrow, .hero__sub, .hero__actions, .hero__scroll, .nav', { opacity: 0, y: 20, duration: 0.9, stagger: 0.08, ease: 'power3.out', clearProps: 'opacity,transform' }, '-=0.9')
+      // exit: warp forward through the stars, pass through the logo circle, arrive at the hero moon
+      .addLabel('warp', reduced ? '+=0' : '+=0.7')
+      .to(galaxy.state, { zoom: 6, warp: 1, duration: 1.3, ease: 'expo.in' }, 'warp')
+      .to('#loaderName, #loaderCountWrap', { opacity: 0, duration: 0.35 }, 'warp')
+      .to('#loaderMoon', { scale: 26, opacity: 0, duration: 1.25, ease: 'expo.in' }, 'warp+=0.1')
+      .to('#loader', { opacity: 0, duration: 0.55, ease: 'power2.out' }, 'warp+=1.05')
+      .fromTo(heroApi ? heroApi.intro : {}, { p: 1 }, { p: 0, duration: 2.2, ease: 'expo.out' }, 'warp+=0.95')
+      .set('#loader', { display: 'none', onComplete: () => galaxy.stop() }, 'warp+=1.65')
+      .from('.hero__title .line > span', { yPercent: 110, duration: 1.2, stagger: 0.12, ease: 'expo.out' }, 'warp+=1.5')
+      .from('.hero__eyebrow, .hero__sub, .hero__actions, .hero__scroll, .nav', { opacity: 0, y: 20, duration: 0.9, stagger: 0.08, ease: 'power3.out', clearProps: 'opacity,transform' }, 'warp+=1.8')
     if (reduced) tl.progress(1)
   }
 }
@@ -101,6 +109,7 @@ $$('a[href^="#"]').forEach((a) =>
 /* ---------------- Hero ---------------- */
 if (webgl) {
   const hero = initHero($('#heroCanvas'), { reduced })
+  heroApi = hero
   ScrollTrigger.create({ trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true, onUpdate: (s) => hero.setScroll(s.progress) })
 }
 gsap.to('.hero__inner', { yPercent: -25, opacity: 0, ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } })
@@ -141,7 +150,7 @@ const pad = (n) => String(n).padStart(2, '0')
 const panel = $('#planet')
 function fillPanel(i) {
   const p = projects[i]
-  $('#plEyebrow').textContent = `Planet ${pad(i + 1)} · ${p.date}`
+  $('#plEyebrow').textContent = p.moonOf != null ? `Moon of ${projects[p.moonOf].title} · ${p.date}` : `Planet ${pad(planetNumber(projects, i))} · ${p.date}`
   $('#plTitle').textContent = p.title
   $('#plMeta').textContent = `${p.place} · ${p.partner}`
   $('#plDesc').textContent = p.desc
@@ -217,12 +226,12 @@ if (useAsteroid) {
     xTo(e.clientX)
     yTo(e.clientY)
   })
-  // snap onto small controls (buttons, links, planet labels); big cards and the 3D canvas just enlarge it
+  // crash into controls (buttons, links, planet labels, cards); the 3D canvas just enlarges it
   document.addEventListener('pointerover', (e) => {
     const el = e.target.closest('a, button, [role=tab]')
     if (el) {
       const r = el.getBoundingClientRect()
-      const small = r.width < 380 && r.height < 120
+      const small = r.width < 1100 && r.height < 460 // buttons, links, labels and the get-involved cards
       asteroid.setSnap(small ? el : null, true)
     } else asteroid.setSnap(null, !!e.target.closest('#systemCanvas'))
   })

@@ -5,7 +5,7 @@ export function initHero(canvas, { reduced }) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true })
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75))
   const scene = new THREE.Scene()
-  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100)
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 220)
   camera.position.set(0, 0.4, 9)
 
   const uniforms = { uTime: { value: 0 }, uScroll: { value: 0 }, uMoonX: { value: 2.4 } }
@@ -107,6 +107,40 @@ export function initHero(canvas, { reduced }) {
   })
   scene.add(new THREE.Points(sGeo, starMat))
 
+  // ---------- Fly-through stars (only visible during the intro zoom) ----------
+  const flyCount = 1600
+  const fPos = new Float32Array(flyCount * 3)
+  for (let i = 0; i < flyCount; i++) {
+    fPos[i * 3] = (Math.random() - 0.5) * 30
+    fPos[i * 3 + 1] = (Math.random() - 0.5) * 18
+    fPos[i * 3 + 2] = 6 + Math.random() * 60
+  }
+  const fGeo = new THREE.BufferGeometry()
+  fGeo.setAttribute('position', new THREE.BufferAttribute(fPos, 3))
+  const flyMat = new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    uniforms: { uPixel: { value: renderer.getPixelRatio() }, uIntro: { value: 0 } },
+    vertexShader: /* glsl */ `
+      uniform float uPixel; varying float vD;
+      void main(){
+        vec4 mv = modelViewMatrix * vec4(position, 1.);
+        vD = -mv.z;
+        gl_PointSize = uPixel * clamp(28. / vD, 1., 9.);
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: /* glsl */ `
+      uniform float uIntro; varying float vD;
+      void main(){
+        float d = length(gl_PointCoord - .5);
+        if (d > .5 || vD < .2) discard;
+        gl_FragColor = vec4(vec3(.86, .91, 1.), smoothstep(.5, 0., d) * smoothstep(0., .25, uIntro) * smoothstep(.2, 2.5, vD));
+      }`,
+  })
+  scene.add(new THREE.Points(fGeo, flyMat))
+  const intro = { p: reduced ? 0 : 1 } // 1 = far out in the stars, 0 = arrived at the moon
+
   // ---------- Interaction ----------
   const mouse = { x: 0, y: 0, tx: 0, ty: 0 }
   window.addEventListener('pointermove', (e) => {
@@ -114,12 +148,14 @@ export function initHero(canvas, { reduced }) {
     mouse.ty = (e.clientY / window.innerHeight - 0.5) * 2
   })
 
+  let baseZ = 9
   function resize() {
     const w = canvas.clientWidth, h = canvas.clientHeight
     renderer.setSize(w, h, false)
     camera.aspect = w / h
     const m = w < 700
-    camera.position.z = m ? 13 : 9
+    baseZ = m ? 13 : 9
+    camera.position.z = baseZ
     moonGroup.position.set(m ? 0.4 : 2.5, m ? 2.6 : 0.15, 0)
     moonGroup.scale.setScalar(m ? 0.72 : 1)
     sea.position.y = m ? -3.2 : -1.75
@@ -144,7 +180,12 @@ export function initHero(canvas, { reduced }) {
     mouse.y += (mouse.ty - mouse.y) * 0.05
     camera.position.x = mouse.x * 0.5
     camera.position.y = 0.4 - mouse.y * 0.3 + uniforms.uScroll.value * 1.5
-    camera.lookAt(0, uniforms.uScroll.value * 1.2, 0)
+    // intro: start ~60 units back in the stars, dolly in and settle on the usual framing
+    const ip = intro.p
+    camera.position.z = baseZ + ip * ip * 60
+    const look = new THREE.Vector3(0, uniforms.uScroll.value * 1.2, 0).lerp(moonGroup.position, Math.min(1, ip * 1.4))
+    camera.lookAt(look)
+    flyMat.uniforms.uIntro.value = ip
     // the light swings with the cursor so the craters catch it
     light.set(-0.55 - mouse.x * 0.6, 0.45 - mouse.y * 0.5, 0.75).normalize()
     moonMat.uniforms.uLight.value.copy(light)
@@ -157,6 +198,7 @@ export function initHero(canvas, { reduced }) {
   tick()
 
   return {
+    intro,
     setScroll(p) {
       uniforms.uScroll.value = p
     },

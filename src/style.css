@@ -99,7 +99,7 @@ html.has-asteroid * { cursor: none !important; }
   align-content: center;
   gap: 22px;
 }
-.loader { background: radial-gradient(120% 90% at 50% 50%, #174d64 0%, var(--teal) 45%, var(--night) 100%); }
+.loader { background: #02040f; }
 .loader__sky { position: absolute; inset: 0; width: 100%; height: 100%; }
 .loader > :not(.loader__sky) { position: relative; z-index: 1; }
 .loader__moon {
@@ -319,6 +319,11 @@ html.has-asteroid * { cursor: none !important; }
   will-change: transform;
 }
 .planet-label.is-occluded { opacity: 0; pointer-events: none; }
+/* tiny moons: just a small crescent badge; the name slides out on hover */
+.planet-label--moon { padding: 3px 7px; font-size: 11px; gap: 0; background: rgb(12 49 66 / 0.4); }
+.planet-label--moon .planet-label__name { max-width: 0; overflow: hidden; transition: max-width 0.4s, margin 0.4s; }
+.planet-label--moon.is-hover .planet-label__name { max-width: 220px; margin-left: 6px; }
+.planet-label--moon .planet-label__num { font-style: normal; font-size: 11px; }
 .planet-label__num { font-size: 13px; font-style: italic; color: var(--pink); }
 .planet-label__thumb {
   position: absolute;

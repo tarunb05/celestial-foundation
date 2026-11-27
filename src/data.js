@@ -3,6 +3,8 @@
 // `impact` — fill in real numbers. A stat with value `null` shows as "—".
 //   e.g. impact: [{ value: '120', label: 'students reached' }, { value: '12', label: 'volunteers' }]
 // `planet` — how the project looks in the solar system (brand palette).
+// `moonOf` — set to the index of a main project to make this a small project: a tiny moon orbiting
+//   that planet. Main projects (no `moonOf`) are planets; the orbits re-space for any number of them.
 export const projects = [
   {
     title: 'The Spirit of Giving',
@@ -87,7 +89,8 @@ export const projects = [
     impact: [{ value: null, label: 'people impacted' }],
     gallery: ['/img/period-myths.jpg'],
     link: 'https://www.instagram.com/_ektara._/reel/C6qbiRkMqZX/',
-    planet: { a: '#446878', b: '#a9c4cf', c: '#13445a', bands: 1, size: 0.46 },
+    moonOf: 1, // a smaller project: tiny moon orbiting the Menstrual Awareness planet
+    planet: { a: '#446878', b: '#a9c4cf', c: '#13445a', bands: 0, size: 0.17 },
   },
   {
     title: 'Guess the Period Product',
@@ -102,7 +105,8 @@ export const projects = [
     impact: [{ value: null, label: 'people impacted' }],
     gallery: ['/img/period-products.jpg'],
     link: 'https://www.instagram.com/_ektara._/reel/C7Omx84SK1z/',
-    planet: { a: '#ff9fc2', b: '#fef4e8', c: '#970747', bands: 0, size: 0.4 },
+    moonOf: 1,
+    planet: { a: '#ff9fc2', b: '#fef4e8', c: '#970747', bands: 0, size: 0.14 },
   },
 ]
 

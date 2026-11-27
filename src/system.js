@@ -6,6 +6,11 @@ import { noiseGLSL, bakeMoonTexture, createMoonMaterial, createGlow } from './mo
  * Solar system of projects: the Celestial moon at the centre, one planet per project.
  * Hover slows the system down, click flies the camera to the planet.
  */
+/** 1-based number of a main planet (moons are not counted) */
+export function planetNumber(projects, i) {
+  return projects.slice(0, i + 1).filter((p) => p.moonOf == null).length
+}
+
 export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, onHover, onFocus }) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true })
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75))
@@ -110,25 +115,45 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
       mesh.add(ring)
     }
 
-    // generous invisible hit target so small planets are easy to click
-    const hit = new THREE.Mesh(new THREE.SphereGeometry(Math.max(look.size * 1.8, 0.75), 12, 12), new THREE.MeshBasicMaterial({ visible: false }))
+    const isMoon = p.moonOf != null
+
+    // generous invisible hit target so small planets (and tiny moons) are easy to click
+    const hit = new THREE.Mesh(new THREE.SphereGeometry(Math.max(look.size * (isMoon ? 2.6 : 1.8), isMoon ? 0.42 : 0.75), 12, 12), new THREE.MeshBasicMaterial({ visible: false }))
     hit.userData.index = i
     scene.add(hit)
 
     const orbit = new THREE.LineLoop(
       new THREE.BufferGeometry().setFromPoints(Array.from({ length: 256 }, (_, k) => new THREE.Vector3(Math.cos((k / 256) * Math.PI * 2), 0, Math.sin((k / 256) * Math.PI * 2)))),
-      new THREE.LineBasicMaterial({ color: 0x6f93a3, transparent: true, opacity: 0.28 })
+      new THREE.LineBasicMaterial({ color: 0x6f93a3, transparent: true, opacity: isMoon ? 0.22 : 0.28 })
     )
     scene.add(orbit)
 
     const label = document.createElement('button')
-    label.className = 'planet-label'
+    label.className = `planet-label${isMoon ? ' planet-label--moon' : ''}`
     label.type = 'button'
-    label.innerHTML = `<span class="planet-label__num">${String(i + 1).padStart(2, '0')}</span><span class="planet-label__name">${p.title}</span><span class="planet-label__thumb"><img src="${p.gallery[0]}" alt="" loading="lazy" /></span>`
+    label.innerHTML = `<span class="planet-label__num">${isMoon ? '☾' : String(planetNumber(projects, i)).padStart(2, '0')}</span><span class="planet-label__name">${p.title}</span><span class="planet-label__thumb"><img src="${p.gallery[0]}" alt="" loading="lazy" /></span>`
     label.setAttribute('aria-label', `Explore ${p.title}`)
     labelsEl.appendChild(label)
 
-    return { mesh, hit, orbit, label, uniforms, size: look.size, phase: (i / projects.length) * Math.PI * 2 + i * 0.7, radius: 0, speed: 0, pos: new THREE.Vector3() }
+    return {
+      mesh, hit, orbit, label, uniforms,
+      size: look.size,
+      parent: isMoon ? p.moonOf : null,
+      phase: (i / projects.length) * Math.PI * 2 + i * 0.7,
+      radius: 0,
+      speed: 0,
+      incline: isMoon ? 0.35 + ((i * 0.37) % 0.5) : 0, // moons orbit on tilted planes
+      pos: new THREE.Vector3(),
+    }
+  })
+  // moons: radius and speed relative to their planet
+  planets.forEach((pl) => {
+    if (pl.parent == null) return
+    const siblings = planets.filter((q) => q.parent === pl.parent)
+    const j = siblings.indexOf(pl)
+    pl.radius = planets[pl.parent].size * 1.9 + j * 0.34
+    pl.speed = 1.1 - j * 0.25
+    pl.orbit.rotation.x = -pl.incline // matches the tilted plane used for the moon's position
   })
 
   // ---------- Layout ----------
@@ -144,15 +169,19 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
     mobile = W / H < 0.9
     camera.fov = mobile ? 50 : 40
     const base = mobile ? 1.75 : 2.7
-    const gap = mobile ? 0.66 : 0.92
+    const outer = mobile ? 5.6 : 8.0 // outermost orbit, however many planets there are
+    const main = planets.filter((pl) => pl.parent == null)
+    const gap = main.length > 1 ? Math.min(mobile ? 0.66 : 0.92, (outer - base) / (main.length - 1)) : 0
     const moonR = mobile ? 1.15 : 1.45
     moon.scale.setScalar(moonR)
     halo.scale.setScalar(moonR * 6)
-    planets.forEach((pl, i) => {
-      pl.radius = base + i * gap
+    main.forEach((pl, k) => {
+      pl.radius = base + k * gap
       pl.speed = 0.32 / Math.pow(pl.radius / base, 1.5)
+      pl.phase = (k / main.length) * Math.PI * 2 + k * 0.7
       pl.orbit.scale.setScalar(pl.radius)
     })
+    planets.forEach((pl) => pl.parent != null && pl.orbit.scale.setScalar(pl.radius))
     if (mobile) home.pos.set(0, 22, 9.5) // steeper, more top-down view uses the tall screen
     else home.pos.set(0, 9.4, 17.5).multiplyScalar(THREE.MathUtils.clamp(1.6 / camera.aspect, 1, 1.5)) // pull back on narrower screens
     if (!focused) {
@@ -314,9 +343,23 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
     const my = (-moonWorld.y * 0.5 + 0.5) * H
     centerLabel.style.transform = `translate3d(${mx}px, ${my + moonPx + 18}px, 0) translateX(-50%)`
 
-    planets.forEach((pl, i) => {
+    // positions: planets around the Celestial moon first, then moons around their planet (on tilted planes)
+    for (const pl of planets) {
+      if (pl.parent != null) continue
       const a = pl.phase + simT * pl.speed
       pl.pos.set(Math.cos(a) * pl.radius, 0, Math.sin(a) * pl.radius)
+    }
+    for (const pl of planets) {
+      if (pl.parent == null) continue
+      const host = planets[pl.parent]
+      const a = pl.phase + simT * pl.speed
+      const ci = Math.cos(pl.incline), si = Math.sin(pl.incline)
+      const lx = Math.cos(a) * pl.radius, lz = Math.sin(a) * pl.radius
+      pl.pos.set(host.pos.x + lx, host.pos.y + lz * si, host.pos.z + lz * ci)
+      pl.orbit.position.copy(host.pos)
+    }
+
+    planets.forEach((pl, i) => {
       pl.mesh.position.copy(pl.pos)
       pl.hit.position.copy(pl.pos)
       pl.mesh.rotation.y += dt * (0.15 + i * 0.03)

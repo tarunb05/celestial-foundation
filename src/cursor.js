@@ -20,42 +20,45 @@ function glowSprite([r, g, b], size = 64) {
  * Shatter the sprite into jagged wedge-shaped pieces that fit back together.
  * Each piece keeps its centroid so it can start (and reassemble) exactly in place.
  */
-function makeFragments(img, S = 68, n = 7) {
-  const c = { x: S / 2 + (Math.random() - 0.5) * 8, y: S / 2 + (Math.random() - 0.5) * 8 }
-  const angles = Array.from({ length: n }, (_, i) => (i / n) * TAU + (Math.random() - 0.5) * (TAU / n) * 0.6)
-  const far = S * 0.95
-  // shared jagged boundaries so neighbouring pieces interlock
-  const bounds = angles.map((a) => {
-    const dx = Math.cos(a), dy = Math.sin(a)
-    const j = (Math.random() - 0.5) * S * 0.14
-    return {
-      mid: { x: c.x + dx * S * 0.24 - dy * j, y: c.y + dy * S * 0.24 + dx * j },
-      far: { x: c.x + dx * far, y: c.y + dy * far },
+function makeFragments(img, n = 7, S = 68) {
+  // rasterise the sprite, then split its pixels into n chunks around random seed points
+  // (a jittered Voronoi split, so edges are rocky and the chunks interlock perfectly)
+  const base = document.createElement('canvas')
+  base.width = base.height = S
+  const bg = base.getContext('2d')
+  bg.drawImage(img, 0, 0, S, S)
+  const src = bg.getImageData(0, 0, S, S).data
+  const seeds = Array.from({ length: n }, () => {
+    const a = Math.random() * TAU, r = Math.sqrt(Math.random()) * S * 0.42
+    return { x: S / 2 + Math.cos(a) * r, y: S / 2 + Math.sin(a) * r }
+  })
+  const out = seeds.map(() => ({ data: new ImageData(S, S), sx: 0, sy: 0, count: 0 }))
+  for (let y = 0; y < S; y++) {
+    for (let x = 0; x < S; x++) {
+      const o = (y * S + x) * 4
+      if (src[o + 3] < 8) continue
+      // a little positional noise makes the cracks jagged instead of straight
+      const jx = x + Math.sin(y * 0.9 + x * 0.3) * 2.2, jy = y + Math.cos(x * 0.8 - y * 0.4) * 2.2
+      let best = 0, bd = Infinity
+      for (let k = 0; k < n; k++) {
+        const d = (jx - seeds[k].x) ** 2 + (jy - seeds[k].y) ** 2
+        if (d < bd) (bd = d), (best = k)
+      }
+      const f = out[best]
+      f.data.data.set(src.subarray(o, o + 4), o)
+      f.sx += x
+      f.sy += y
+      f.count++
     }
-  })
-  return angles.map((a, k) => {
-    const b0 = bounds[k], b1 = bounds[(k + 1) % n]
-    let a1 = angles[(k + 1) % n]
-    if (a1 < a) a1 += TAU
-    const am = (a + a1) / 2
-    const cv = document.createElement('canvas')
-    cv.width = cv.height = S
-    const g = cv.getContext('2d')
-    g.beginPath()
-    g.moveTo(c.x, c.y)
-    g.lineTo(b0.mid.x, b0.mid.y)
-    g.lineTo(b0.far.x, b0.far.y)
-    g.lineTo(c.x + Math.cos(am) * far * 1.3, c.y + Math.sin(am) * far * 1.3)
-    g.lineTo(b1.far.x, b1.far.y)
-    g.lineTo(b1.mid.x, b1.mid.y)
-    g.closePath()
-    g.clip()
-    g.drawImage(img, 0, 0, S, S)
-    // rough centroid of the visible part of the wedge
-    const cx = c.x + Math.cos(am) * S * 0.24
-    const cy = c.y + Math.sin(am) * S * 0.24
-    return { cv, cx, cy, S }
-  })
+  }
+  return out
+    .filter((f) => f.count > 6)
+    .map((f) => {
+      const cv = document.createElement('canvas')
+      cv.width = cv.height = S
+      cv.getContext('2d').putImageData(f.data, 0, 0)
+      return { cv, cx: f.sx / f.count, cy: f.sy / f.count, S }
+    })
 }
 
 function makeLayer(cls) {
@@ -101,9 +104,18 @@ export function initAsteroidCursor() {
   const rock = new Image()
   rock.src = '/img/asteroid.png'
   const ROCK_PX = 34 // drawn size of the whole asteroid
+  // pre-shattered sets: small targets break the asteroid into a few chunks, big ones into many
+  const CHUNKS = [6, 10, 15, 22]
+  let sets = {}
   let pieces = []
   rock.onload = () => {
-    pieces = makeFragments(rock).map((p) => ({ ...p, x: 0, y: 0, vx: 0, vy: 0, rot: 0, vr: 0, theta: 0, omega: 0, k: 1, inc: 0.5, phi: 0, z: 0, g: 1 }))
+    for (const n of CHUNKS) sets[n] = makeFragments(rock, n).map((p) => ({ ...p, x: 0, y: 0, vx: 0, vy: 0, rot: 0, vr: 0, theta: 0, omega: 0, k: 1, inc: 0.5, phi: 0, z: 0, g: 1 }))
+    pieces = sets[CHUNKS[0]]
+  }
+  function chunksFor(r) {
+    const perimeter = 2 * (r.width + r.height)
+    const want = perimeter / 48 // roughly one chunk per 48px of the target's outline
+    return CHUNKS.reduce((best, n) => (Math.abs(n - want) < Math.abs(best - want) ? n : best), CHUNKS[0])
   }
   // crash state: 'whole' → 'orbit' (shattered around a button) → 'gather' (reassembling) → 'whole'
   let mode = 'whole', gatherT = 0
@@ -133,6 +145,7 @@ export function initAsteroidCursor() {
   // and then settle into tilted orbits around it
   function crash(el, fromWhole) {
     const r = el.getBoundingClientRect()
+    if (fromWhole) pieces = sets[chunksFor(r)] || pieces // more chunks for bigger targets
     const ix = Math.max(r.left, Math.min(r.right, pos.x))
     const iy = Math.max(r.top, Math.min(r.bottom, pos.y))
     const ds = ROCK_PX / pieces[0].S
