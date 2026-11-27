@@ -259,6 +259,8 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
     (e) => {
       zoomEl.removeAttribute('data-lenis-prevent-wheel')
       if (focused !== null) return
+      // no scroll-to-zoom on phones (touch devices or phone-sized screens): scrolling just moves the page
+      if (mobile || W < 760 || window.matchMedia('(pointer: coarse)').matches) return
       const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY
       const next = THREE.MathUtils.clamp(view.zoomT * Math.exp(dy * (e.ctrlKey ? 0.01 : 0.0016)), ZOOM_IN, ZOOM_OUT)
       if (Math.abs(next - view.zoomT) < 1e-4) return // at the limit: let the page scroll

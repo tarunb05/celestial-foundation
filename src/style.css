@@ -659,6 +659,7 @@ html.has-asteroid * { cursor: none !important; }
   .nav__links { gap: 22px; font-size: 13px; }
 }
 @media (max-width: 760px) {
+  .hint--zoom { display: none !important; } /* no scroll-to-zoom on phone-sized screens */
   .nav { flex-wrap: wrap; row-gap: 10px; padding-top: 14px; padding-bottom: 10px; }
   .nav__brand span { display: none; }
   .nav__links { order: 3; width: 100%; justify-content: center; gap: 26px; padding-top: 10px; border-top: 1px solid rgb(252 241 208 / 0.12); }
