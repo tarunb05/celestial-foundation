@@ -8,17 +8,23 @@
     <meta name="theme-color" content="#13445A" />
     <meta property="og:title" content="The Celestial Foundation" />
     <meta property="og:description" content="Small acts. Big smiles. A registered non-profit for education & social development in Bangalore." />
-    <meta property="og:image" content="/img/spirit-of-giving.jpg" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:image" content="/img/logo.png" />
+    <link rel="icon" href="/img/logo-64.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/img/logo-192.png" />
+    <link rel="preload" as="image" href="/img/logo.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
   </head>
   <body>
     <!-- Loader -->
     <div class="loader" id="loader" aria-hidden="true">
-      <div class="loader__moon"><span class="loader__fill" id="loaderFill"></span></div>
-      <p class="loader__count"><span id="loaderCount">0</span>%</p>
+      <div class="loader__moon" id="loaderMoon">
+        <span class="loader__fill" id="loaderFill"></span>
+        <img class="loader__logo" id="loaderLogo" src="/img/logo.png" alt="" />
+      </div>
+      <p class="loader__count" id="loaderCountWrap"><span id="loaderCount">0</span>%</p>
+      <p class="loader__name" id="loaderName"><span>The Celestial Foundation</span></p>
     </div>
 
     <div class="grain" aria-hidden="true"></div>
@@ -26,20 +32,12 @@
 
     <header class="nav" id="nav">
       <a href="#top" class="nav__brand" aria-label="The Celestial Foundation home">
-        <svg class="mark" viewBox="0 0 64 64" aria-hidden="true">
-          <circle cx="32" cy="32" r="30" fill="#13445A" />
-          <circle cx="32" cy="32" r="23" fill="#FEF4E8" />
-          <circle cx="25" cy="24" r="5" fill="#E9D9B8" />
-          <circle cx="38" cy="20" r="3" fill="#E9D9B8" />
-          <circle cx="40" cy="33" r="4" fill="#E9D9B8" />
-          <path d="M9 44c5-6 9-2 12-7 2 5 6 4 9 0 2 5 7 5 10 0 2 4 6 4 9-1 3 4 5 5 7 7-6 12-17 15-24 15S14 54 9 44z" fill="#13445A" />
-        </svg>
+        <img class="mark" src="/img/logo-192.png" alt="" width="40" height="40" />
         <span>The Celestial<br />Foundation</span>
       </a>
       <nav class="nav__links" aria-label="Primary">
         <a href="#mission">Mission</a>
-        <a href="#projects">Projects</a>
-        <a href="#moments">Moments</a>
+        <a href="#work">Our work</a>
         <a href="#involved">Get involved</a>
       </nav>
       <button class="btn btn--crimson nav__cta" data-open-contact>Contact us</button>
@@ -59,7 +57,7 @@
             <p class="hero__sub">Education &amp; social development, focused on sustainable community impact — one government school, one smile, one small act at a time.</p>
             <div class="hero__actions">
               <button class="btn btn--crimson" data-open-contact>Collaborate · Fundraise · Volunteer</button>
-              <a class="btn btn--ghost" href="#projects">See our projects</a>
+              <a class="btn btn--ghost" href="#work">See our work</a>
             </div>
           </div>
         </div>
@@ -99,38 +97,32 @@
         </div>
       </section>
 
-      <!-- PROJECTS (3D orbit) -->
-      <section class="projects" id="projects">
-        <div class="projects__pin" id="projectsPin">
-          <canvas class="projects__canvas" id="orbitCanvas" aria-hidden="true"></canvas>
-          <div class="projects__head">
-            <p class="eyebrow">( Projects in orbit )</p>
-            <h2>Our work, <br /><em>constellated.</em></h2>
-          </div>
-          <div class="projects__detail" id="projectDetail" aria-live="polite">
-            <p class="projects__count"><span id="pCount">01</span> / <span id="pTotal">06</span></p>
-            <p class="projects__meta" id="pMeta"></p>
-            <h3 class="projects__title" id="pTitle"></h3>
-            <p class="projects__desc" id="pDesc"></p>
-            <a class="projects__link" id="pLink" href="#" target="_blank" rel="noopener">View on Instagram ↗</a>
-          </div>
-          <div class="projects__progress"><span id="pBar"></span></div>
-          <p class="projects__hint">Scroll or drag to orbit</p>
+      <!-- OUR WORK: solar system -->
+      <section class="work" id="work">
+        <canvas class="work__canvas" id="systemCanvas" aria-hidden="true"></canvas>
+        <div class="work__head">
+          <p class="eyebrow">( Our work )</p>
+          <h2>Everything we do, <em>in orbit.</em></h2>
         </div>
-        <!-- Fallback / accessible list, also used when WebGL is unavailable -->
-        <ol class="projects__list" id="projectsList"></ol>
-      </section>
+        <div class="work__labels" id="systemLabels"></div>
+        <p class="work__center" id="systemCenter">Celestial</p>
+        <p class="work__hint"><span class="hint--fine">Click</span><span class="hint--touch">Tap</span> a planet to land</p>
 
-      <!-- MOMENTS -->
-      <section class="moments" id="moments">
-        <div class="moments__head">
-          <p class="eyebrow eyebrow--dark">( Moments )</p>
-          <h2>Exploring, learning<br />&amp; <em>laughing together.</em></h2>
-          <p class="moments__quip">We’re an NGO — of course grammar isn’t our strong suit. Kindness, though? We’re fluent.</p>
-        </div>
-        <div class="strip" id="strip">
-          <div class="strip__track" id="stripTrack"></div>
-        </div>
+        <aside class="planet" id="planet" aria-hidden="true" data-lenis-prevent>
+          <button class="planet__back" id="planetBack">← Back to orbit</button>
+          <p class="planet__eyebrow" id="plEyebrow"></p>
+          <h3 class="planet__title" id="plTitle"></h3>
+          <p class="planet__meta" id="plMeta"></p>
+          <p class="planet__desc" id="plDesc"></p>
+          <div class="planet__impact" id="plImpact"></div>
+          <h4 class="planet__h">What we did</h4>
+          <ul class="planet__did" id="plDid"></ul>
+          <div class="planet__gallery" id="plGallery"></div>
+          <a class="planet__link" id="plLink" href="#" target="_blank" rel="noopener">See it on Instagram ↗</a>
+        </aside>
+
+        <!-- used when WebGL is unavailable -->
+        <ol class="work__list" id="workList"></ol>
       </section>
 
       <!-- GET INVOLVED -->
@@ -179,19 +171,11 @@
         <p>The Celestial Foundation<br />Registered Non-Profit · Education &amp; Social Development<br />📍 Bangalore, India</p>
         <ul>
           <li><a href="https://www.instagram.com/thecelestialfoundation/" target="_blank" rel="noopener">Instagram ↗</a></li>
-          <li><a href="https://linktr.ee/TheCelestialFoundation" target="_blank" rel="noopener">Linktree ↗</a></li>
-          <li><a href="https://docs.google.com/forms/d/e/1FAIpQLSdqEvn8XoHeVg3XUgB2bGfceg8JpSPV9g9FFQa4hlWi7Ftjxg/viewform?usp=sf_link" target="_blank" rel="noopener">Volunteer form ↗</a></li>
           <li><a href="tel:+916360771754">+91 63607 71754</a></li>
         </ul>
       </div>
       <p class="footer__small">© <span id="year"></span> The Celestial Foundation. Made with love under the same sky.</p>
     </footer>
-
-    <!-- Floating contact -->
-    <button class="fab" data-open-contact aria-label="Contact us">
-      <span class="fab__ring"></span>
-      <span class="fab__text">Contact us</span>
-    </button>
 
     <!-- Contact dialog -->
     <dialog class="contact" id="contact" aria-labelledby="contactTitle">
@@ -208,7 +192,6 @@
         <a class="btn btn--crimson" id="contactWa" href="#" target="_blank" rel="noopener">Message on WhatsApp</a>
         <a class="btn btn--outline" href="tel:+916360771754">Call +91 63607 71754</a>
       </div>
-      <a class="contact__form" id="contactForm" href="https://docs.google.com/forms/d/e/1FAIpQLSdqEvn8XoHeVg3XUgB2bGfceg8JpSPV9g9FFQa4hlWi7Ftjxg/viewform?usp=sf_link" target="_blank" rel="noopener">Prefer a form? Fill the volunteer enrollment form ↗</a>
     </dialog>
 
     <script type="module" src="/src/main.js"></script>

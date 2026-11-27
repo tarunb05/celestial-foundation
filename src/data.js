@@ -1,70 +1,109 @@
 // Content sourced from @thecelestialfoundation Instagram posts.
+//
+// `impact` — fill in real numbers. A stat with value `null` shows as "—".
+//   e.g. impact: [{ value: '120', label: 'students reached' }, { value: '12', label: 'volunteers' }]
+// `planet` — how the project looks in the solar system (brand palette).
 export const projects = [
   {
     title: 'The Spirit of Giving',
     date: 'January 2026',
     place: 'Government school, Horamavu',
     partner: 'with Ektara',
-    desc: 'Small acts, big smiles. We celebrated the season by sharing stationery, laughter and moments of joy with these amazing kids — because giving isn’t about how much you give, but how much love you put into it.',
-    img: '/img/spirit-of-giving.jpg',
+    desc: 'Small acts, big smiles. Because giving isn’t about how much you give — but how much love you put into it.',
+    did: [
+      'Visited a government school in Horamavu, Bangalore',
+      'Shared stationery with the students',
+      'Celebrated the season together with laughter and moments of joy',
+      'Partnered with Ektara to make it happen',
+    ],
+    impact: [{ value: null, label: 'people impacted' }],
+    gallery: ['/img/spirit-of-giving.jpg'],
     link: 'https://www.instagram.com/thecelestialfoundation/reel/DTfuP9jkto4/',
+    planet: { a: '#970747', b: '#ff8fb8', c: '#3d0220', bands: 1, size: 0.62 },
   },
   {
     title: 'Menstrual Awareness Session',
     date: 'December 2025',
     place: 'Kalkere Government School',
     partner: 'with Ektara',
-    desc: 'A beautiful day of beautiful work: an open, judgement-free session with students to normalise conversations about periods and menstrual health.',
-    img: '/img/kalkere.jpg',
+    desc: 'A beautiful day of beautiful work — an open, judgement-free conversation about periods.',
+    did: [
+      'Ran a menstrual awareness session at Kalkere Government School',
+      'Helped students talk openly about periods and menstrual health',
+      'Worked to normalise menstruation and break the stigma around it',
+      'Partnered with Ektara',
+    ],
+    impact: [{ value: null, label: 'people impacted' }],
+    gallery: ['/img/kalkere.jpg'],
     link: 'https://www.instagram.com/_ektara._/reel/DSmV27XEkQ8/',
+    planet: { a: '#5c0430', b: '#d94a86', c: '#fef4e8', bands: 0, size: 0.5 },
   },
   {
     title: 'Day of Technology',
     date: 'August 2025',
     place: 'Government school, Bangalore',
     partner: 'with Ms. Poornima',
-    desc: 'We donated a laptop to a government school, because access to technology is essential for quality education. Ms. Poornima now uses it to teach the children digital literacy.',
-    img: '/img/laptop.jpg',
+    desc: 'Access to technology is essential for quality education and digital empowerment.',
+    did: [
+      'Donated a laptop to a government school on the Day of Technology',
+      'Supported Ms. Poornima, who teaches the children digital literacy',
+      'Helped equip students with skills to thrive in a digital world',
+    ],
+    impact: [
+      { value: '1', label: 'laptop donated' },
+      { value: null, label: 'people impacted' },
+    ],
+    gallery: ['/img/laptop.jpg'],
     link: 'https://www.instagram.com/thecelestialfoundation/p/DNCOCGftaUb/',
+    planet: { a: '#13445a', b: '#6fa3b8', c: '#fef4e8', bands: 0, size: 0.55 },
   },
   {
     title: 'Advaya Summer Camp',
     date: 'May 2024',
     place: 'Advaya Foundation, Bangalore',
     partner: 'with Advaya Foundation',
-    desc: 'Where smiles grow and memories remain. Celestials and Advaya teamed up for a summer camp of exploring, learning and laughing together — run by volunteers with boundless energy.',
-    img: '/img/advaya-2.jpg',
+    desc: 'Where smiles grow and memories remain.',
+    did: [
+      'Teamed up with Advaya Foundation to run a summer camp for children',
+      'Called on volunteers to create magical memories for young adventurers',
+      'Spent the camp exploring, learning and laughing together',
+    ],
+    impact: [{ value: null, label: 'people impacted' }],
+    gallery: ['/img/advaya-2.jpg', '/img/advaya-1.jpg', '/img/camp-poster-1.jpg', '/img/camp-poster-2.jpg'],
     link: 'https://www.instagram.com/thecelestialfoundation/reel/C63MHoZy4fH/',
+    planet: { a: '#d9c9a3', b: '#fef4e8', c: '#970747', bands: 1, size: 0.78, ring: true },
   },
   {
     title: 'Busting Period Myths',
     date: 'May 2024',
-    place: 'Online series',
+    place: 'Online video series',
     partner: 'with Ektara',
-    desc: '“Menstruating women can cure the plague?” A video series taking on the myths and taboos that still surround periods — one myth at a time.',
-    img: '/img/period-myths.jpg',
+    desc: '“Menstruating women can cure the plague?” Taking on period myths, one at a time.',
+    did: [
+      'Created a myth-busting video series with Ektara',
+      'Took on the myths and taboos that still surround menstruation',
+      'Reached audiences online to spark honest conversations',
+    ],
+    impact: [{ value: null, label: 'people impacted' }],
+    gallery: ['/img/period-myths.jpg'],
     link: 'https://www.instagram.com/_ektara._/reel/C6qbiRkMqZX/',
+    planet: { a: '#446878', b: '#a9c4cf', c: '#13445a', bands: 1, size: 0.46 },
   },
   {
     title: 'Guess the Period Product',
     date: 'May 2024',
-    place: 'Online series',
+    place: 'Street-style video',
     partner: 'with Ektara',
-    desc: 'Pads, cups, tampons, discs — a playful street-style game to get people talking about the products, and the conversations, that too often stay hidden.',
-    img: '/img/period-products.jpg',
+    desc: 'A playful game to get people talking about the products — and conversations — that too often stay hidden.',
+    did: [
+      'Filmed a street-style “guess the period product” game with Ektara',
+      'Got people talking openly about menstrual products',
+    ],
+    impact: [{ value: null, label: 'people impacted' }],
+    gallery: ['/img/period-products.jpg'],
     link: 'https://www.instagram.com/_ektara._/reel/C7Omx84SK1z/',
+    planet: { a: '#ff9fc2', b: '#fef4e8', c: '#970747', bands: 0, size: 0.4 },
   },
-]
-
-export const moments = [
-  { img: '/img/advaya-1.jpg', caption: 'Advaya Summer Camp' },
-  { img: '/img/hiring.jpg', caption: 'POV: you’re a volunteer at Celestial :)' },
-  { img: '/img/camp-poster-1.jpg', caption: 'Summer camp — call for volunteers' },
-  { img: '/img/grammar.jpg', caption: 'Of course we’re an NGO' },
-  { img: '/img/spirit-of-giving.jpg', caption: 'The spirit of giving' },
-  { img: '/img/camp-poster-2.jpg', caption: 'Join us. Make memories.' },
-  { img: '/img/kalkere.jpg', caption: 'Kalkere, Dec 2025' },
-  { img: '/img/laptop.jpg', caption: 'Digital literacy class' },
 ]
 
 export const PHONE = '916360771754'
@@ -79,7 +118,7 @@ export const intents = {
     msg: 'Hi Celestial Foundation! I’d like to help fundraise / donate.',
   },
   volunteer: {
-    blurb: 'Bring your energy to our next school visit, camp or campaign. Message us, or fill the volunteer enrollment form below.',
+    blurb: 'Bring your energy to our next school visit, camp or campaign. Drop us a message and we’ll get you on board.',
     msg: 'Hi Celestial Foundation! I’d like to volunteer with you.',
   },
 }
