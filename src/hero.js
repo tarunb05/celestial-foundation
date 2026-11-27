@@ -24,10 +24,10 @@ export function initHero(canvas, { reduced }) {
   moonGroup.add(glow)
 
   // thin crimson orbit + satellite
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(2.65, 0.0055, 8, 240), new THREE.MeshBasicMaterial({ color: 0x970747, transparent: true, opacity: 0.8 }))
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(2.65, 0.0055, 8, 240), new THREE.MeshBasicMaterial({ color: 0xf2d58a, transparent: true, opacity: 0.75 }))
   ring.rotation.set(1.3, 0.2, 0)
   moonGroup.add(ring)
-  const satellite = new THREE.Mesh(new THREE.SphereGeometry(0.055, 16, 16), new THREE.MeshBasicMaterial({ color: 0xff5c95 }))
+  const satellite = new THREE.Mesh(new THREE.SphereGeometry(0.055, 16, 16), new THREE.MeshBasicMaterial({ color: 0xfcf1d0 }))
   moonGroup.add(satellite)
 
   // ---------- Particle sea, with moonlight glinting on the crests ----------
@@ -69,8 +69,8 @@ export function initHero(canvas, { reduced }) {
       varying float vH; varying float vD; varying float vGlint;
       void main(){
         if (length(gl_PointCoord - .5) > .5) discard;
-        vec3 slate = vec3(.267, .408, .471);
-        vec3 cream = vec3(.996, .957, .91);
+        vec3 slate = vec3(.2, .32, .62);
+        vec3 cream = vec3(.988, .945, .816);
         vec3 col = mix(slate, cream, smoothstep(.1, .8, vH) * .8 + vGlint);
         float fade = smoothstep(23., 6., vD);
         gl_FragColor = vec4(col, clamp(.45 + vH * .7 + vGlint, .18, 1.) * fade);

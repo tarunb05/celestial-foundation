@@ -21,7 +21,7 @@ export const projects = [
     impact: [{ value: null, label: 'people impacted' }],
     gallery: ['/img/spirit-of-giving.jpg'],
     link: 'https://www.instagram.com/thecelestialfoundation/reel/DTfuP9jkto4/',
-    planet: { a: '#970747', b: '#ff8fb8', c: '#3d0220', bands: 1, size: 0.52 },
+    planet: { a: '#22396f', b: '#f2d58a', c: '#0d1c42', bands: 1, size: 0.52 },
   },
   {
     title: 'Menstrual Awareness Session',
@@ -38,7 +38,7 @@ export const projects = [
     impact: [{ value: null, label: 'people impacted' }],
     gallery: ['/img/kalkere.jpg'],
     link: 'https://www.instagram.com/_ektara._/reel/DSmV27XEkQ8/',
-    planet: { a: '#5c0430', b: '#d94a86', c: '#fef4e8', bands: 0, size: 0.44 },
+    planet: { a: '#0d1c42', b: '#8fa6dd', c: '#fcf1d0', bands: 0, size: 0.44 },
   },
   {
     title: 'Day of Technology',
@@ -57,7 +57,7 @@ export const projects = [
     ],
     gallery: ['/img/laptop.jpg'],
     link: 'https://www.instagram.com/thecelestialfoundation/p/DNCOCGftaUb/',
-    planet: { a: '#13445a', b: '#6fa3b8', c: '#fef4e8', bands: 0, size: 0.46 },
+    planet: { a: '#1b3a8a', b: '#7fb0ff', c: '#fcf1d0', bands: 0, size: 0.46 },
   },
   {
     title: 'Advaya Summer Camp',
@@ -73,7 +73,7 @@ export const projects = [
     impact: [{ value: null, label: 'people impacted' }],
     gallery: ['/img/advaya-2.jpg', '/img/advaya-1.jpg', '/img/camp-poster-1.jpg', '/img/camp-poster-2.jpg'],
     link: 'https://www.instagram.com/thecelestialfoundation/reel/C63MHoZy4fH/',
-    planet: { a: '#d9c9a3', b: '#fef4e8', c: '#970747', bands: 1, size: 0.6, ring: true },
+    planet: { a: '#e8d6a6', b: '#fcf1d0', c: '#22396f', bands: 1, size: 0.6, ring: true },
   },
   {
     title: 'Busting Period Myths',
@@ -89,7 +89,7 @@ export const projects = [
     impact: [{ value: null, label: 'people impacted' }],
     gallery: ['/img/period-myths.jpg'],
     link: 'https://www.instagram.com/_ektara._/reel/C6qbiRkMqZX/',
-    planet: { a: '#446878', b: '#a9c4cf', c: '#13445a', bands: 1, size: 0.4 },
+    planet: { a: '#22396f', b: '#b9c8ee', c: '#010736', bands: 1, size: 0.4 },
   },
   {
     title: 'Guess the Period Product',
@@ -104,19 +104,19 @@ export const projects = [
     impact: [{ value: null, label: 'people impacted' }],
     gallery: ['/img/period-products.jpg'],
     link: 'https://www.instagram.com/_ektara._/reel/C7Omx84SK1z/',
-    planet: { a: '#ff9fc2', b: '#fef4e8', c: '#970747', bands: 0, size: 0.34 },
+    planet: { a: '#f2d58a', b: '#fcf1d0', c: '#22396f', bands: 0, size: 0.34 },
   },
 
   // ---- Placeholders: replace with real projects (keep `placeholder: true` off once filled in) ----
   ...[
-    { a: '#2a5f74', b: '#9fd0dc', c: '#0c3142', bands: 1, size: 0.46 },
-    { a: '#7a2b52', b: '#e7a6c4', c: '#2a0a1b', bands: 0, size: 0.38 },
-    { a: '#c9b48a', b: '#fef4e8', c: '#446878', bands: 1, size: 0.5 },
+    { a: '#2a4a8f', b: '#a9c0f0', c: '#0d1c42', bands: 1, size: 0.46 },
+    { a: '#c8a65e', b: '#f6e3b0', c: '#0d1c42', bands: 0, size: 0.38 },
+    { a: '#5b6fae', b: '#dfe6ff', c: '#010736', bands: 1, size: 0.5 },
   ].map((planet, k) => placeholder(`Project ${String(7 + k).padStart(2, '0')}`, planet)),
   // tiny moons for smaller projects (moonOf = index of the planet they circle)
-  placeholder('Small project', { a: '#a9c4cf', b: '#fef4e8', c: '#446878', bands: 0, size: 0.13 }, 0),
-  placeholder('Small project', { a: '#e7a6c4', b: '#fef4e8', c: '#970747', bands: 0, size: 0.12 }, 3),
-  placeholder('Small project', { a: '#d9c9a3', b: '#fef4e8', c: '#13445a', bands: 0, size: 0.14 }, 6),
+  placeholder('Small project', { a: '#a9c0f0', b: '#fcf1d0', c: '#22396f', bands: 0, size: 0.13 }, 0),
+  placeholder('Small project', { a: '#f2d58a', b: '#fcf1d0', c: '#22396f', bands: 0, size: 0.12 }, 3),
+  placeholder('Small project', { a: '#e8d6a6', b: '#fcf1d0', c: '#0d1c42', bands: 0, size: 0.14 }, 6),
 ]
 
 function placeholder(title, planet, moonOf) {

@@ -124,7 +124,7 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
 
     const orbit = new THREE.LineLoop(
       new THREE.BufferGeometry().setFromPoints(Array.from({ length: 256 }, (_, k) => new THREE.Vector3(Math.cos((k / 256) * Math.PI * 2), 0, Math.sin((k / 256) * Math.PI * 2)))),
-      new THREE.LineBasicMaterial({ color: 0x6f93a3, transparent: true, opacity: isMoon ? 0.22 : 0.28 })
+      new THREE.LineBasicMaterial({ color: 0x4a64a8, transparent: true, opacity: isMoon ? 0.22 : 0.28 })
     )
     scene.add(orbit)
 
@@ -376,7 +376,7 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
       const s = 1 + pl.uniforms.uHover.value * (focused === null ? 0.25 : 0)
       pl.mesh.scale.setScalar(s * K)
       pl.orbit.material.opacity += ((i === hovered ? 0.9 : 0.28) - pl.orbit.material.opacity) * 0.1
-      pl.orbit.material.color.set(i === hovered ? 0xd94a86 : 0x6f93a3)
+      pl.orbit.material.color.set(i === hovered ? 0xf2d58a : 0x4a64a8)
 
       // label below the planet
       v.copy(pl.pos).project(camera)

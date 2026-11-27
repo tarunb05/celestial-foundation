@@ -133,7 +133,7 @@ export function createMoonMaterial(map, { full = 0, bump = 0.035 } = {}) {
         vec3 L = normalize(uLight);
         float diff = smoothstep(-.3, .75, dot(bn, L));
         float relief = clamp(.92 + dot(bn - n, L) * 1.8, .78, 1.12);   // keeps craters readable when full-lit
-        vec3 night = mix(vec3(.07, .2, .27), tex.rgb * .32, .45);       // brand-teal earthshine
+        vec3 night = mix(vec3(.03, .06, .2), tex.rgb * .32, .45);       // navy earthshine
         vec3 lit = mix(night, tex.rgb * relief, mix(diff, 1., uFull));
         lit *= 1. - pow(fres, 3.) * .25 * uFull;                        // limb darkening
         lit += vec3(1., .94, .86) * pow(fres, 2.5) * .3 * mix(diff, .8, uFull);

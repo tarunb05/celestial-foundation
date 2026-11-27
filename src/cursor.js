@@ -120,7 +120,7 @@ export function initAsteroidCursor() {
   // crash state: 'whole' → 'orbit' (shattered around a button) → 'gather' (reassembling) → 'whole'
   let mode = 'whole', gatherT = 0
   const rings = [] // impact shockwaves
-  const glow = glowSprite([255, 120, 165])
+  const glow = glowSprite([242, 213, 138])
   const spark = glowSprite([255, 226, 200])
 
   const mouse = { x: W / 2, y: H / 2 }
@@ -266,7 +266,7 @@ export function initAsteroidCursor() {
         continue
       }
       rctx.globalAlpha = g.life * 0.8
-      rctx.strokeStyle = 'rgb(255,190,215)'
+      rctx.strokeStyle = 'rgb(252,241,208)'
       rctx.lineWidth = 2 * g.life
       rctx.beginPath()
       rctx.arc(g.x, g.y, (1 - g.life) * 46 + 4, 0, TAU)
