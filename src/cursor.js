@@ -51,14 +51,13 @@ export function initAsteroidCursor() {
   resize()
   window.addEventListener('resize', resize)
 
-  const flyImg = loadImage('/img/ufo-fly.png') // tilted, with speed lines (faces right)
-  const hoverImg = loadImage('/img/ufo.png') // level saucer
-  const FLY_W = 38, HOVER_W = 40
+  const hoverImg = loadImage('/img/ufo.png') // the one, level saucer — used in every state
+  const HOVER_W = 40
 
   const mouse = { x: W / 2, y: H / 2 }
   const pos = { x: W / 2, y: H / 2 }
   let visible = false, facing = 1, scale = 1, scaleT = 1, heat = 0, t = 0
-  let target = null, beam = 0, hoverMix = 0
+  let target = null, beam = 0
   const motes = [] // little specks drifting up the beam
 
   window.addEventListener('pointermove', (e) => {
@@ -127,6 +126,11 @@ export function initAsteroidCursor() {
       r = target.getBoundingClientRect()
       tx = r.left + r.width / 2 + (mouse.x - (r.left + r.width / 2)) * 0.08
       ty = r.top - 30 + Math.sin(t * 3) * 2.5 // hover just above it, bobbing
+      // never leave the screen: keep the whole saucer inside the viewport
+      const halfW = (HOVER_W * scale) / 2 + 4
+      const halfH = (HOVER_W * scale * (hoverImg.naturalHeight || 19)) / (hoverImg.naturalWidth || 40) / 2 + 4
+      tx = Math.min(W - halfW, Math.max(halfW, tx))
+      ty = Math.min(H - halfH, Math.max(halfH, ty))
     }
     const px = pos.x, py = pos.y
     const follow = r ? 0.2 : 0.35
@@ -138,8 +142,6 @@ export function initAsteroidCursor() {
     if (Math.abs(vx) > 0.8) facing = Math.sign(vx)
     scale += (scaleT - scale) * 0.15
     beam += ((r ? 1 : 0) - beam) * 0.12
-    // level out when hovering or nearly still; tilt into the flying pose when moving
-    hoverMix += ((r || speed < 1.5 ? 1 : 0) - hoverMix) * 0.18
 
     // ---- the space: dust field reacting to the UFO ----
     dctx.clearRect(0, 0, W, H)
@@ -203,8 +205,7 @@ export function initAsteroidCursor() {
       ctx.drawImage(img, -w / 2, -h / 2, w, h)
       ctx.restore()
     }
-    drawSprite(flyImg, FLY_W * scale, 1 - hoverMix, facing < 0)
-    drawSprite(hoverImg, HOVER_W * scale, hoverMix, false)
+    drawSprite(hoverImg, HOVER_W * scale, 1, false)
     // the saucer's lights blink while it hovers
     if (r && hoverImg.complete) {
       ctx.globalAlpha = 0.6 + 0.4 * Math.sin(t * 8)
