@@ -61,6 +61,24 @@ function makeFragments(img, n = 7, S = 68) {
     })
 }
 
+// ---- pixel-art helpers: everything snaps to a PX grid so it reads like the sprites ----
+const PX = 3
+const FIRE = ['#f4e72a', '#f2b51f', '#ee8a1e', '#dd3b1f', '#b51e17', '#6e1210'] // hot → cool
+function fireColor(life) {
+  return FIRE[Math.min(FIRE.length - 1, Math.floor((1 - life) * FIRE.length))]
+}
+function pixel(ctx, x, y, cells, color) {
+  const s = cells * PX
+  ctx.fillStyle = color
+  ctx.fillRect(Math.round(x / PX) * PX - Math.floor(cells / 2) * PX, Math.round(y / PX) * PX - Math.floor(cells / 2) * PX, s, s)
+}
+function pixelCross(ctx, x, y, arm, color) {
+  const gx = Math.round(x / PX) * PX, gy = Math.round(y / PX) * PX
+  ctx.fillStyle = color
+  ctx.fillRect(gx - arm * PX, gy, (arm * 2 + 1) * PX, PX)
+  ctx.fillRect(gx, gy - arm * PX, PX, (arm * 2 + 1) * PX)
+}
+
 function makeLayer(cls) {
   const cv = document.createElement('canvas')
   cv.className = `asteroid-layer ${cls}`
@@ -72,30 +90,17 @@ function makeLayer(cls) {
 }
 
 export function initAsteroidCursor() {
-  // dust uses `difference` blending so it reads on both the dark and cream sections
-  const dustCv = makeLayer('asteroid-layer--dust')
   const rockCv = makeLayer('asteroid-layer--rock')
-  const dctx = dustCv.getContext('2d')
   const rctx = rockCv.getContext('2d')
 
-  const SP = 58 // dust spacing in px
-  let W = 0, H = 0, span = 0, dust = []
+  let W = 0, H = 0
   function resize() {
     const dpr = Math.min(window.devicePixelRatio, 2)
     W = window.innerWidth
     H = window.innerHeight
-    for (const [cv, ctx] of [[dustCv, dctx], [rockCv, rctx]]) {
-      cv.width = W * dpr
-      cv.height = H * dpr
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-    }
-    span = H + SP * 2
-    dust = []
-    for (let y = 0; y < span; y += SP) {
-      for (let x = -SP; x < W + SP; x += SP) {
-        dust.push({ hx: x + Math.random() * SP, hy: y + Math.random() * SP, ox: 0, oy: 0, vx: 0, vy: 0, s: 0.6 + Math.random() * 1.1, tw: Math.random() * TAU })
-      }
-    }
+    rockCv.width = W * dpr
+    rockCv.height = H * dpr
+    rctx.setTransform(dpr, 0, 0, dpr, 0, 0)
   }
   resize()
   window.addEventListener('resize', resize)
@@ -119,14 +124,13 @@ export function initAsteroidCursor() {
   }
   // crash state: 'whole' → 'orbit' (shattered around a button) → 'gather' (reassembling) → 'whole'
   let mode = 'whole', gatherT = 0
-  const rings = [] // impact shockwaves
-  const glow = glowSprite([242, 213, 138])
-  const spark = glowSprite([255, 226, 200])
+  const flames = [] // pixel flame tail
+  const sparkles = [] // pixel "+" twinkles off the tail
+  const booms = [] // tiny pixel explosions at impact points
 
   const mouse = { x: W / 2, y: H / 2 }
   const pos = { x: W / 2, y: H / 2 }
   let visible = false, angle = 0, spinDir = 1, scale = 1, scaleT = 1, heat = 0, t = 0, snapEl = null
-  const sparks = []
 
   window.addEventListener('pointermove', (e) => {
     if (e.pointerType !== 'mouse') return
@@ -150,7 +154,17 @@ export function initAsteroidCursor() {
     const iy = Math.max(r.top, Math.min(r.bottom, pos.y))
     const ds = ROCK_PX / pieces[0].S
     const dir = Math.random() < 0.5 ? 1 : -1
-    if (fromWhole) rings.push({ x: ix, y: iy, life: 1 })
+    if (fromWhole)
+      booms.push({
+        x: ix,
+        y: iy,
+        life: 1,
+        seed: Math.random() * 10,
+        bits: Array.from({ length: 12 }, () => {
+          const a = Math.random() * TAU, s = 2 + Math.random() * 3.5
+          return { x: ix, y: iy, vx: Math.cos(a) * s, vy: Math.sin(a) * s }
+        }),
+      })
     pieces.forEach((p, i) => {
       if (fromWhole) {
         p.x = pos.x + (p.cx - p.S / 2) * ds
@@ -170,8 +184,6 @@ export function initAsteroidCursor() {
       p.inc = 0.35 + Math.random() * 0.4
       p.phi = (Math.random() - 0.5) * 0.7
     })
-    if (fromWhole)
-      for (let i = 0; i < 10; i++) sparks.push({ x: ix, y: iy, vx: (Math.random() - 0.5) * 7, vy: (Math.random() - 0.5) * 7, life: 1 })
     mode = 'orbit'
   }
 
@@ -188,92 +200,87 @@ export function initAsteroidCursor() {
     angle += (0.01 + speed * 0.005) * spinDir
     scale += (scaleT - scale) * 0.15
 
-    // ---- the space: dust field reacting to the asteroid ----
-    dctx.clearRect(0, 0, W, H)
-    const R = 110 + heat * 90
-    const R2 = R * R
-    const shift = (window.scrollY * 0.2) % span
-    dctx.strokeStyle = 'rgb(214,206,196)'
-    dctx.fillStyle = 'rgb(214,206,196)'
-    dctx.lineCap = 'round'
-    for (const d of dust) {
-      let y = d.hy - shift
-      if (y < -SP) y += span
-      const x = d.hx + d.ox
-      y += d.oy
-      const dx = x - pos.x, dy = y - pos.y
-      const dist2 = dx * dx + dy * dy
-      let near = 0
-      if (visible && dist2 < R2) {
-        const dist = Math.sqrt(dist2) || 1
-        near = 1 - dist / R
-        const f = near * near
-        // pushed outward, and dragged along in the asteroid's wake
-        d.vx += (dx / dist) * f * (0.5 + speed * 0.06) + vx * f * 0.06
-        d.vy += (dy / dist) * f * (0.5 + speed * 0.06) + vy * f * 0.06
-      }
-      d.vx = (d.vx - d.ox * 0.012) * 0.9
-      d.vy = (d.vy - d.oy * 0.012) * 0.9
-      d.ox += d.vx
-      d.oy += d.vy
-      const energy = Math.min(1, Math.hypot(d.ox, d.oy) / 36)
-      const a = 0.05 + 0.05 * Math.sin(t * 1.5 + d.tw) + energy * 0.7 + near * 0.3
-      if (a < 0.04) continue
-      dctx.globalAlpha = Math.min(1, a)
-      const sv = Math.hypot(d.vx, d.vy)
-      if (sv > 0.4) {
-        dctx.lineWidth = d.s * 1.2
-        dctx.beginPath()
-        dctx.moveTo(x - d.vx * 3.5, y - d.vy * 3.5)
-        dctx.lineTo(x, y)
-        dctx.stroke()
-      } else {
-        dctx.fillRect(x - d.s / 2, y - d.s / 2, d.s, d.s)
-      }
-    }
-    dctx.globalAlpha = 1
-
-    // ---- the rock ----
     rctx.clearRect(0, 0, W, H)
-    if (visible && speed > 14 && Math.random() < 0.25 && sparks.length < 24) {
-      sparks.push({ x: pos.x, y: pos.y, vx: -vx * 0.08 + (Math.random() - 0.5), vy: -vy * 0.08 + (Math.random() - 0.5), life: 1 })
+
+    // ---- pixel-art flame tail (like a comet): emitted behind the rock while it moves ----
+    if (visible && mode === 'whole' && speed > 1.2) {
+      const ux = vx / speed, uy = vy / speed
+      const n = Math.min(10, 2 + Math.floor(speed * 0.45))
+      for (let i = 0; i < n; i++) {
+        const back = ROCK_PX * 0.3 + Math.random() * speed * 0.6
+        const side = (Math.random() - 0.5) * ROCK_PX * (0.9 + heat * 0.5)
+        flames.push({
+          x: pos.x - ux * back - uy * side,
+          y: pos.y - uy * back + ux * side,
+          vx: -ux * (0.4 + speed * 0.08) + (Math.random() - 0.5) * 0.6,
+          vy: -uy * (0.4 + speed * 0.08) + (Math.random() - 0.5) * 0.6 - 0.15, // flames lift slightly
+          size: 2.5 + Math.random() * (2 + heat * 3), // in pixel-grid cells
+          life: 1,
+          decay: 0.035 + Math.random() * 0.04,
+        })
+      }
+      // twinkling pixel sparkles flicking off the tail
+      if (Math.random() < 0.06 + heat * 0.12)
+        sparkles.push({ x: pos.x - ux * (30 + Math.random() * 40) + (Math.random() - 0.5) * 40, y: pos.y - uy * (30 + Math.random() * 40) + (Math.random() - 0.5) * 40, life: 1 })
     }
-    rctx.globalCompositeOperation = 'lighter'
-    for (let i = sparks.length - 1; i >= 0; i--) {
-      const s = sparks[i]
-      s.x += s.vx
-      s.y += s.vy
-      s.life -= 0.05
+    if (flames.length > 260) flames.splice(0, flames.length - 260)
+    for (let i = flames.length - 1; i >= 0; i--) {
+      const f = flames[i]
+      f.x += f.vx
+      f.y += f.vy
+      f.vx *= 0.95
+      f.vy *= 0.95
+      f.life -= f.decay
+      if (f.life <= 0) {
+        flames.splice(i, 1)
+        continue
+      }
+      // hot yellow → orange → red → ember as it cools; shrinks on the pixel grid
+      const cells = Math.max(1, Math.round(f.size * (0.35 + f.life * 0.65)))
+      pixel(rctx, f.x, f.y, cells, fireColor(f.life))
+    }
+    for (let i = sparkles.length - 1; i >= 0; i--) {
+      const s = sparkles[i]
+      s.life -= 0.06
       if (s.life <= 0) {
-        sparks.splice(i, 1)
+        sparkles.splice(i, 1)
         continue
       }
-      const r = 4 * s.life
-      rctx.globalAlpha = s.life
-      rctx.drawImage(spark, s.x - r, s.y - r, r * 2, r * 2)
+      pixelCross(rctx, s.x, s.y, s.life > 0.5 ? 2 : 1, '#f4e72a')
     }
-    if (visible && mode === 'whole') {
-      const gs = (16 + heat * 20) * scale
-      rctx.globalAlpha = 0.12 + heat * 0.35
-      rctx.drawImage(glow, pos.x - gs, pos.y - gs, gs * 2, gs * 2)
-    }
-    // impact shockwaves
-    for (let i = rings.length - 1; i >= 0; i--) {
-      const g = rings[i]
-      g.life -= 0.045
-      if (g.life <= 0) {
-        rings.splice(i, 1)
+
+    // ---- tiny pixel explosion at each point of impact ----
+    for (let i = booms.length - 1; i >= 0; i--) {
+      const b = booms[i]
+      b.life -= 0.05
+      if (b.life <= 0) {
+        booms.splice(i, 1)
         continue
       }
-      rctx.globalAlpha = g.life * 0.8
-      rctx.strokeStyle = 'rgb(252,241,208)'
-      rctx.lineWidth = 2 * g.life
-      rctx.beginPath()
-      rctx.arc(g.x, g.y, (1 - g.life) * 46 + 4, 0, TAU)
-      rctx.stroke()
+      const grow = 1 - b.life
+      // the fireball: grid cells inside a lumpy, growing radius, coloured by distance from the centre
+      const R = (4 + grow * 14) * (b.life > 0.25 ? 1 : b.life * 4)
+      const cr = Math.ceil(R / PX)
+      for (let gy = -cr; gy <= cr; gy++) {
+        for (let gx = -cr; gx <= cr; gx++) {
+          const d = Math.hypot(gx, gy) * PX
+          const lump = R * (0.8 + 0.25 * Math.sin(gx * 1.7 + gy * 2.3 + b.seed))
+          if (d > lump) continue
+          const k = d / lump // 0 centre → 1 rim
+          const heatHere = (1 - k) * (0.4 + b.life * 0.8)
+          rctx.fillStyle = fireColor(Math.min(1, heatHere + 0.15))
+          rctx.fillRect(Math.round(b.x / PX + gx) * PX, Math.round(b.y / PX + gy) * PX, PX, PX)
+        }
+      }
+      // debris pixels flying out
+      for (const d of b.bits) {
+        d.x += d.vx
+        d.y += d.vy
+        d.vx *= 0.9
+        d.vy *= 0.9
+        pixel(rctx, d.x, d.y, 1, fireColor(b.life * 0.9))
+      }
     }
-    rctx.globalAlpha = 1
-    rctx.globalCompositeOperation = 'source-over'
 
     // ---- shattered pieces: orbiting the button in 3D, or flying back together ----
     if (mode !== 'whole' && pieces.length) {
@@ -369,10 +376,8 @@ export function initAsteroidCursor() {
     },
     /** re-enter the top layer so the asteroid stays above an open modal dialog */
     raise() {
-      for (const cv of [dustCv, rockCv]) {
-        cv.hidePopover()
-        cv.showPopover()
-      }
+      rockCv.hidePopover()
+      rockCv.showPopover()
     },
   }
 }
