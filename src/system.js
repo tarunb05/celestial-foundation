@@ -198,14 +198,59 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
       pl.radius = pl.moonBase * K
       pl.orbit.scale.setScalar(pl.radius)
     })
-    if (mobile) home.pos.set(0, 22, 9.5) // steeper, more top-down view uses the tall screen
-    else home.pos.set(0, 10, 18.6).multiplyScalar(THREE.MathUtils.clamp(1.6 / camera.aspect, 1, 1.5)) // pull back on narrower screens
+    if (mobile) baseHome.set(0, 22, 9.5) // steeper, more top-down view uses the tall screen
+    else baseHome.set(0, 10, 18.6).multiplyScalar(THREE.MathUtils.clamp(1.6 / camera.aspect, 1, 1.5)) // pull back on narrower screens
+    computeHome()
     if (!focused) {
       cam.pos.copy(home.pos)
       cam.target.copy(home.target)
     }
     camera.updateProjectionMatrix()
   }
+
+  // ---------- Drag to orbit the camera around the system ----------
+  // The layout gives a base viewpoint; dragging spins it around the centre (yaw) and tilts it
+  // between almost top-down and almost edge-on (pitch), with a little momentum after release.
+  const baseHome = new THREE.Vector3()
+  const view = { yaw: 0, pitch: 0, vyaw: 0, vpitch: 0 }
+  let dragging = false, dragMoved = 0, lastX = 0, lastY = 0, suppressClick = false, camTween = false
+  function computeHome() {
+    const R = baseHome.length()
+    const el0 = Math.asin(baseHome.y / R)
+    view.pitch = THREE.MathUtils.clamp(view.pitch, 0.12 - el0, 1.48 - el0)
+    const el = el0 + view.pitch
+    const az = Math.atan2(baseHome.x, baseHome.z) + view.yaw
+    home.pos.set(R * Math.cos(el) * Math.sin(az), R * Math.sin(el), R * Math.cos(el) * Math.cos(az))
+  }
+  canvas.addEventListener('pointerdown', (e) => {
+    if (focused !== null || e.button !== 0) return
+    dragging = true
+    dragMoved = 0
+    lastX = e.clientX
+    lastY = e.clientY
+    view.vyaw = view.vpitch = 0
+    canvas.setPointerCapture?.(e.pointerId)
+    canvas.classList.add('is-dragging')
+  })
+  canvas.addEventListener('pointermove', (e) => {
+    if (!dragging) return
+    const dx = e.clientX - lastX, dy = e.clientY - lastY
+    lastX = e.clientX
+    lastY = e.clientY
+    dragMoved += Math.abs(dx) + Math.abs(dy)
+    view.vyaw = -dx * 0.006
+    view.vpitch = e.pointerType === 'touch' ? 0 : dy * 0.004 // on touch, vertical swipes scroll the page
+    view.yaw += view.vyaw
+    view.pitch += view.vpitch
+  })
+  const endDrag = () => {
+    if (!dragging) return
+    dragging = false
+    canvas.classList.remove('is-dragging')
+    if (dragMoved > 6) suppressClick = true // a drag is not a click on a planet
+  }
+  canvas.addEventListener('pointerup', endDrag)
+  canvas.addEventListener('pointercancel', endDrag)
 
   // ---------- Interaction ----------
   let hovered = -1, focused = null, timeScale = 1, timeTarget = 1, simT = 0
@@ -242,6 +287,10 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
   })
   canvas.addEventListener('pointerleave', () => ndc.set(9, 9))
   canvas.addEventListener('click', (e) => {
+    if (suppressClick) {
+      suppressClick = false
+      return
+    }
     const i = pick(e.clientX, e.clientY)
     if (i >= 0) api.focus(i)
     else if (focused !== null) api.blur()
@@ -302,7 +351,8 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
       if (focused === null) return
       focused = null
       const dur = reduced ? 0 : 1.4
-      gsap.to(cam.pos, { x: home.pos.x, y: home.pos.y, z: home.pos.z, duration: dur, ease: 'expo.inOut' })
+      camTween = true // the tween owns the camera until it lands back on the (dragged) home view
+      gsap.to(cam.pos, { x: home.pos.x, y: home.pos.y, z: home.pos.z, duration: dur, ease: 'expo.inOut', onComplete: () => (camTween = false) })
       gsap.to(cam.target, { x: home.target.x, y: home.target.y, z: home.target.z, duration: dur, ease: 'expo.inOut' })
       gsap.to(cam, {
         ox: 0,
@@ -344,8 +394,19 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
       shared.uTime.value += dt
     }
 
-    // camera (gentle parallax while browsing)
-    const par = focused === null && !reduced ? 1 : 0
+    // dragged view (with momentum once released)
+    if (focused === null && !camTween) {
+      if (!dragging && !reduced) {
+        view.yaw += view.vyaw
+        view.pitch += view.vpitch
+        view.vyaw *= 0.94
+        view.vpitch *= 0.9
+      }
+      computeHome()
+      cam.pos.copy(home.pos)
+    }
+    // camera (gentle parallax while browsing, off while dragging)
+    const par = focused === null && !reduced && !dragging ? 1 : 0
     camera.position.set(cam.pos.x + mouse.x * 0.8 * par, cam.pos.y + mouse.y * 0.5 * par, cam.pos.z)
     camera.lookAt(cam.target)
     if (cam.ox || cam.oy) camera.setViewOffset(W, H, W * cam.ox, H * cam.oy, W, H)
