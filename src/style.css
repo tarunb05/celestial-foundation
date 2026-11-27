@@ -8,14 +8,16 @@
   --night: #0c3142;
   --pad: clamp(20px, 4vw, 56px);
 
-  /* typography: "Elegant" — Cormorant Garamond display + Outfit body */
-  --serif: 'Cormorant Garamond', 'Times New Roman', serif;
-  --sans: 'Outfit', system-ui, -apple-system, sans-serif;
+  /* typography: star-atlas feel — Marcellus display, Cinzel engraved labels,
+     Cormorant italic accents, Jost body */
+  --serif: 'Marcellus', 'Times New Roman', serif;
+  --sans: 'Jost', system-ui, -apple-system, sans-serif;
+  --label: 'Cinzel', 'Times New Roman', serif;
   --em-font: 'Cormorant Garamond', serif;
   --em-style: italic;
-  --dw: 500;
-  --dt: -0.02em;
-  --dlh: 0.86;
+  --dw: 400;
+  --dt: -0.01em;
+  --dlh: 0.95;
 }
 
 *,
@@ -48,9 +50,14 @@ em { font-family: var(--em-font); font-style: var(--em-style); font-weight: inhe
 html.has-asteroid,
 html.has-asteroid * { cursor: none !important; }
 
+/* engraved star-chart labels */
+.eyebrow, .loader__name, .nav__brand span, .work__center, .work__hint, .planet__eyebrow, .planet__h, .stat__label, .marquee i {
+  font-family: var(--label);
+  font-weight: 600;
+}
 .eyebrow {
   font-size: 12px;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--cream) 70%, transparent);
   display: inline-flex;
@@ -210,7 +217,7 @@ html.has-asteroid * { cursor: none !important; }
 }
 .hero__inner a, .hero__inner button { pointer-events: auto; }
 .hero__eyebrow { margin-bottom: 22px; }
-.hero__title { font-size: clamp(56px, 11.5vw, 196px); line-height: var(--dlh); }
+.hero__title { font-size: clamp(48px, 9.6vw, 168px); line-height: var(--dlh); }
 .hero__title .line { display: block; overflow: hidden; padding-bottom: 0.06em; }
 .hero__title .line > span { display: inline-block; }
 .hero__title em { color: var(--pink); }
