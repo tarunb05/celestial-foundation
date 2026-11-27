@@ -1,65 +1,10 @@
-// Asteroid cursor: a tumbling rock that disturbs the space around it.
-// A faint field of cosmic dust covers the page; as the asteroid flies through,
-// nearby dust is pushed aside, caught in its wake and lights up, then drifts home.
+// UFO cursor.
+// - Flying: the tilted UFO (with speed lines) follows the mouse, facing the way it travels,
+//   and disturbs a faint field of space dust as it passes.
+// - Over anything clickable (buttons, links, planets, moons): it parks above the target,
+//   levels out, bobs gently and shines a pixel tractor beam down onto it.
 const TAU = Math.PI * 2
-
-function glowSprite([r, g, b], size = 64) {
-  const c = document.createElement('canvas')
-  c.width = c.height = size
-  const x = c.getContext('2d')
-  const grd = x.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
-  grd.addColorStop(0, `rgba(${r},${g},${b},1)`)
-  grd.addColorStop(0.3, `rgba(${r},${g},${b},0.4)`)
-  grd.addColorStop(1, `rgba(${r},${g},${b},0)`)
-  x.fillStyle = grd
-  x.fillRect(0, 0, size, size)
-  return c
-}
-
-/**
- * Shatter the sprite into jagged wedge-shaped pieces that fit back together.
- * Each piece keeps its centroid so it can start (and reassemble) exactly in place.
- */
-function makeFragments(img, n = 7, S = 68) {
-  // rasterise the sprite, then split its pixels into n chunks around random seed points
-  // (a jittered Voronoi split, so edges are rocky and the chunks interlock perfectly)
-  const base = document.createElement('canvas')
-  base.width = base.height = S
-  const bg = base.getContext('2d')
-  bg.drawImage(img, 0, 0, S, S)
-  const src = bg.getImageData(0, 0, S, S).data
-  const seeds = Array.from({ length: n }, () => {
-    const a = Math.random() * TAU, r = Math.sqrt(Math.random()) * S * 0.42
-    return { x: S / 2 + Math.cos(a) * r, y: S / 2 + Math.sin(a) * r }
-  })
-  const out = seeds.map(() => ({ data: new ImageData(S, S), sx: 0, sy: 0, count: 0 }))
-  for (let y = 0; y < S; y++) {
-    for (let x = 0; x < S; x++) {
-      const o = (y * S + x) * 4
-      if (src[o + 3] < 8) continue
-      // a little positional noise makes the cracks jagged instead of straight
-      const jx = x + Math.sin(y * 0.9 + x * 0.3) * 2.2, jy = y + Math.cos(x * 0.8 - y * 0.4) * 2.2
-      let best = 0, bd = Infinity
-      for (let k = 0; k < n; k++) {
-        const d = (jx - seeds[k].x) ** 2 + (jy - seeds[k].y) ** 2
-        if (d < bd) (bd = d), (best = k)
-      }
-      const f = out[best]
-      f.data.data.set(src.subarray(o, o + 4), o)
-      f.sx += x
-      f.sy += y
-      f.count++
-    }
-  }
-  return out
-    .filter((f) => f.count > 6)
-    .map((f) => {
-      const cv = document.createElement('canvas')
-      cv.width = cv.height = S
-      cv.getContext('2d').putImageData(f.data, 0, 0)
-      return { cv, cx: f.sx / f.count, cy: f.sy / f.count, S }
-    })
-}
+const PX = 3 // pixel grid for the beam, so it matches the sprites
 
 function makeLayer(cls) {
   const cv = document.createElement('canvas')
@@ -71,12 +16,18 @@ function makeLayer(cls) {
   return cv
 }
 
+function loadImage(src) {
+  const img = new Image()
+  img.src = src
+  return img
+}
+
 export function initAsteroidCursor() {
   // dust uses `difference` blending so it reads on both the dark and cream sections
   const dustCv = makeLayer('asteroid-layer--dust')
-  const rockCv = makeLayer('asteroid-layer--rock')
+  const ufoCv = makeLayer('asteroid-layer--rock')
   const dctx = dustCv.getContext('2d')
-  const rctx = rockCv.getContext('2d')
+  const ctx = ufoCv.getContext('2d')
 
   const SP = 58 // dust spacing in px
   let W = 0, H = 0, span = 0, dust = []
@@ -84,10 +35,10 @@ export function initAsteroidCursor() {
     const dpr = Math.min(window.devicePixelRatio, 2)
     W = window.innerWidth
     H = window.innerHeight
-    for (const [cv, ctx] of [[dustCv, dctx], [rockCv, rctx]]) {
+    for (const [cv, c] of [[dustCv, dctx], [ufoCv, ctx]]) {
       cv.width = W * dpr
       cv.height = H * dpr
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      c.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
     span = H + SP * 2
     dust = []
@@ -100,33 +51,15 @@ export function initAsteroidCursor() {
   resize()
   window.addEventListener('resize', resize)
 
-  // pixel-art asteroid sprite
-  const rock = new Image()
-  rock.src = '/img/asteroid.png'
-  const ROCK_PX = 24 // drawn size of the whole asteroid
-  // pre-shattered sets: small targets break the asteroid into a few chunks, big ones into many
-  const CHUNKS = [6, 10, 15, 22]
-  let sets = {}
-  let pieces = []
-  rock.onload = () => {
-    for (const n of CHUNKS) sets[n] = makeFragments(rock, n).map((p) => ({ ...p, x: 0, y: 0, vx: 0, vy: 0, rot: 0, vr: 0, theta: 0, omega: 0, k: 1, inc: 0.5, phi: 0, z: 0, g: 1 }))
-    pieces = sets[CHUNKS[0]]
-  }
-  function chunksFor(r) {
-    const perimeter = 2 * (r.width + r.height)
-    const want = perimeter / 48 // roughly one chunk per 48px of the target's outline
-    return CHUNKS.reduce((best, n) => (Math.abs(n - want) < Math.abs(best - want) ? n : best), CHUNKS[0])
-  }
-  // crash state: 'whole' → 'orbit' (shattered around a button) → 'gather' (reassembling) → 'whole'
-  let mode = 'whole', gatherT = 0
-  const rings = [] // impact shockwaves
-  const glow = glowSprite([242, 213, 138])
-  const spark = glowSprite([255, 226, 200])
+  const flyImg = loadImage('/img/ufo-fly.png') // tilted, with speed lines (faces right)
+  const hoverImg = loadImage('/img/ufo.png') // level saucer
+  const FLY_W = 38, HOVER_W = 40
 
   const mouse = { x: W / 2, y: H / 2 }
   const pos = { x: W / 2, y: H / 2 }
-  let visible = false, angle = 0, spinDir = 1, scale = 1, scaleT = 1, heat = 0, t = 0, snapEl = null
-  const sparks = []
+  let visible = false, facing = 1, scale = 1, scaleT = 1, heat = 0, t = 0
+  let target = null, beam = 0, hoverMix = 0
+  const motes = [] // little specks drifting up the beam
 
   window.addEventListener('pointermove', (e) => {
     if (e.pointerType !== 'mouse') return
@@ -139,56 +72,76 @@ export function initAsteroidCursor() {
     }
   })
   document.documentElement.addEventListener('mouseleave', () => (visible = false))
-  window.addEventListener('pointerdown', () => (scale *= 0.8))
+  window.addEventListener('pointerdown', () => (scale *= 0.85))
 
-  // the asteroid hits the button: shatter at the point of contact, pieces burst outward
-  // and then settle into tilted orbits around it
-  function crash(el, fromWhole) {
-    const r = el.getBoundingClientRect()
-    if (fromWhole) pieces = sets[chunksFor(r)] || pieces // more chunks for bigger targets
-    const ix = Math.max(r.left, Math.min(r.right, pos.x))
-    const iy = Math.max(r.top, Math.min(r.bottom, pos.y))
-    const ds = ROCK_PX / pieces[0].S
-    const dir = Math.random() < 0.5 ? 1 : -1
-    if (fromWhole) rings.push({ x: ix, y: iy, life: 1 })
-    pieces.forEach((p, i) => {
-      if (fromWhole) {
-        p.x = pos.x + (p.cx - p.S / 2) * ds
-        p.y = pos.y + (p.cy - p.S / 2) * ds
-        p.rot = 0
+  function drawBeam(topX, topY, r, a) {
+    // a stepped, pixel-art cone from the saucer down over the target
+    const bottomY = r.bottom + 4
+    const topW = 16
+    const bottomW = Math.min(Math.max(r.width + 16, 40), 220)
+    const rows = Math.max(1, Math.floor((bottomY - topY) / PX))
+    for (let i = 0; i < rows; i++) {
+      const k = i / rows
+      const y = Math.round((topY + i * PX) / PX) * PX
+      const w = Math.round((topW + (bottomW - topW) * k) / (PX * 2)) * PX * 2
+      const flicker = 0.85 + 0.15 * Math.sin(t * 9 + i * 0.7)
+      // soft outer beam, brighter core, scanline shimmer
+      ctx.globalAlpha = a * 0.16 * flicker
+      ctx.fillStyle = '#9fe3ff'
+      ctx.fillRect(Math.round(topX - w / 2), y, w, PX)
+      ctx.globalAlpha = a * 0.16 * flicker * (i % 3 === 0 ? 0.6 : 1)
+      ctx.fillStyle = '#d9f6ff'
+      ctx.fillRect(Math.round(topX - w / 4), y, Math.round(w / 2), PX)
+    }
+    // lit ellipse where the beam lands
+    ctx.globalAlpha = a * 0.28
+    ctx.fillStyle = '#bff0ff'
+    ctx.beginPath()
+    ctx.ellipse(topX, bottomY, bottomW / 2, 5, 0, 0, TAU)
+    ctx.fill()
+    // motes rising up the beam
+    if (Math.random() < 0.5 * a) motes.push({ x: topX + (Math.random() - 0.5) * bottomW * 0.8, y: bottomY, life: 1 })
+    for (let i = motes.length - 1; i >= 0; i--) {
+      const m = motes[i]
+      m.y -= 1.2
+      m.x += (topX - m.x) * 0.02 // drawn in toward the saucer
+      m.life -= 0.02
+      if (m.life <= 0 || m.y < topY) {
+        motes.splice(i, 1)
+        continue
       }
-      const ox = p.x - ix, oy = p.y - iy
-      const d = Math.hypot(ox, oy) || 1
-      const burst = 4 + Math.random() * 4
-      p.vx = (ox / d) * burst + (Math.random() - 0.5) * 2
-      p.vy = (oy / d) * burst + (Math.random() - 0.5) * 2
-      p.vr = (Math.random() - 0.5) * 0.35
-      // start each piece's orbit near where it flew off, so the burst flows into the ring
-      p.theta = Math.atan2(p.y - (r.top + r.height / 2), p.x - (r.left + r.width / 2)) + i * 0.15
-      p.omega = (0.022 + Math.random() * 0.018) * (i % 4 === 3 ? -dir : dir)
-      p.k = 0.92 + Math.random() * 0.3
-      p.inc = 0.35 + Math.random() * 0.4
-      p.phi = (Math.random() - 0.5) * 0.7
-    })
-    if (fromWhole)
-      for (let i = 0; i < 10; i++) sparks.push({ x: ix, y: iy, vx: (Math.random() - 0.5) * 7, vy: (Math.random() - 0.5) * 7, life: 1 })
-    mode = 'orbit'
+      ctx.globalAlpha = a * m.life
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(Math.round(m.x / PX) * PX, Math.round(m.y / PX) * PX, PX, PX)
+    }
+    ctx.globalAlpha = 1
   }
 
   function frame() {
     requestAnimationFrame(frame)
     t += 0.016
+
+    // where to fly: the mouse, or parked above the hovered target
+    let tx = mouse.x, ty = mouse.y, r = null
+    if (target && target.isConnected) {
+      r = target.getBoundingClientRect()
+      tx = r.left + r.width / 2 + (mouse.x - (r.left + r.width / 2)) * 0.08
+      ty = r.top - 30 + Math.sin(t * 3) * 2.5 // hover just above it, bobbing
+    }
     const px = pos.x, py = pos.y
-    pos.x += (mouse.x - pos.x) * 0.35
-    pos.y += (mouse.y - pos.y) * 0.35
+    const follow = r ? 0.2 : 0.35
+    pos.x += (tx - pos.x) * follow
+    pos.y += (ty - pos.y) * follow
     const vx = pos.x - px, vy = pos.y - py
     const speed = Math.hypot(vx, vy)
     heat += (Math.min(speed / 22, 1) - heat) * 0.1
-    if (Math.abs(vx) > 0.5) spinDir = Math.sign(vx)
-    angle += (0.01 + speed * 0.005) * spinDir
+    if (Math.abs(vx) > 0.8) facing = Math.sign(vx)
     scale += (scaleT - scale) * 0.15
+    beam += ((r ? 1 : 0) - beam) * 0.12
+    // level out when hovering or nearly still; tilt into the flying pose when moving
+    hoverMix += ((r || speed < 1.5 ? 1 : 0) - hoverMix) * 0.18
 
-    // ---- the space: dust field reacting to the asteroid ----
+    // ---- the space: dust field reacting to the UFO ----
     dctx.clearRect(0, 0, W, H)
     const R = 110 + heat * 90
     const R2 = R * R
@@ -208,7 +161,6 @@ export function initAsteroidCursor() {
         const dist = Math.sqrt(dist2) || 1
         near = 1 - dist / R
         const f = near * near
-        // pushed outward, and dragged along in the asteroid's wake
         d.vx += (dx / dist) * f * (0.5 + speed * 0.06) + vx * f * 0.06
         d.vy += (dy / dist) * f * (0.5 + speed * 0.06) + vy * f * 0.06
       }
@@ -233,143 +185,49 @@ export function initAsteroidCursor() {
     }
     dctx.globalAlpha = 1
 
-    // ---- the rock ----
-    rctx.clearRect(0, 0, W, H)
-    if (visible && speed > 14 && Math.random() < 0.25 && sparks.length < 24) {
-      sparks.push({ x: pos.x, y: pos.y, vx: -vx * 0.08 + (Math.random() - 0.5), vy: -vy * 0.08 + (Math.random() - 0.5), life: 1 })
-    }
-    rctx.globalCompositeOperation = 'lighter'
-    for (let i = sparks.length - 1; i >= 0; i--) {
-      const s = sparks[i]
-      s.x += s.vx
-      s.y += s.vy
-      s.life -= 0.05
-      if (s.life <= 0) {
-        sparks.splice(i, 1)
-        continue
-      }
-      const r = 4 * s.life
-      rctx.globalAlpha = s.life
-      rctx.drawImage(spark, s.x - r, s.y - r, r * 2, r * 2)
-    }
-    if (visible && mode === 'whole') {
-      const gs = (16 + heat * 20) * scale
-      rctx.globalAlpha = 0.12 + heat * 0.35
-      rctx.drawImage(glow, pos.x - gs, pos.y - gs, gs * 2, gs * 2)
-    }
-    // impact shockwaves
-    for (let i = rings.length - 1; i >= 0; i--) {
-      const g = rings[i]
-      g.life -= 0.045
-      if (g.life <= 0) {
-        rings.splice(i, 1)
-        continue
-      }
-      rctx.globalAlpha = g.life * 0.8
-      rctx.strokeStyle = 'rgb(252,241,208)'
-      rctx.lineWidth = 2 * g.life
-      rctx.beginPath()
-      rctx.arc(g.x, g.y, (1 - g.life) * 46 + 4, 0, TAU)
-      rctx.stroke()
-    }
-    rctx.globalAlpha = 1
-    rctx.globalCompositeOperation = 'source-over'
+    // ---- beam + saucer ----
+    ctx.clearRect(0, 0, W, H)
+    if (!visible) return
+    const hh = (HOVER_W * scale * hoverImg.naturalHeight) / (hoverImg.naturalWidth || 1)
+    if (beam > 0.02 && r) drawBeam(pos.x, pos.y + hh * 0.35, r, beam)
+    else motes.length = 0
 
-    // ---- shattered pieces: orbiting the button in 3D, or flying back together ----
-    if (mode !== 'whole' && pieces.length) {
-      const ds = ROCK_PX / pieces[0].S
-      let r = null
-      if (mode === 'orbit' && snapEl && snapEl.isConnected) r = snapEl.getBoundingClientRect()
-      const cx = r ? r.left + r.width / 2 : 0, cy = r ? r.top + r.height / 2 : 0
-      let gathered = 0
-      for (const p of pieces) {
-        let tx, ty
-        if (r) {
-          // a tilted ring around the button: x on an ellipse, y squashed by the inclination,
-          // z (depth) tells us whether the piece is in front of or behind the button
-          p.theta += p.omega
-          const rx = (r.width / 2 + 18) * p.k
-          const ry = (r.height / 2 + 26) * p.k
-          const ex = Math.cos(p.theta) * rx
-          const ey = Math.sin(p.theta) * ry * p.inc
-          p.z = Math.sin(p.theta)
-          tx = cx + ex * Math.cos(p.phi) - ey * Math.sin(p.phi)
-          ty = cy + ex * Math.sin(p.phi) + ey * Math.cos(p.phi)
-          p.vx = (p.vx + (tx - p.x) * 0.035) * 0.84
-          p.vy = (p.vy + (ty - p.y) * 0.035) * 0.84
-          p.vr *= 0.99
-        } else {
-          // reassemble at the cursor, each piece back in its slot
-          tx = pos.x + (p.cx - p.S / 2) * ds
-          ty = pos.y + (p.cy - p.S / 2) * ds
-          p.vx = (p.vx + (tx - p.x) * 0.12) * 0.7
-          p.vy = (p.vy + (ty - p.y) * 0.12) * 0.7
-          p.rot += (Math.round(p.rot / TAU) * TAU - p.rot) * 0.2
-          p.vr *= 0.6
-          p.z += (1 - p.z) * 0.2
-          p.g += (1 - p.g) * 0.25
-          if (Math.hypot(tx - p.x, ty - p.y) < 1.5) gathered++
-        }
-        p.x += p.vx
-        p.y += p.vy
-        p.rot += p.vr
-      }
-      if (mode === 'gather' && (gathered === pieces.length || performance.now() - gatherT > 650)) mode = 'whole'
-      if (mode !== 'whole') {
-        // paint back-to-front; pieces behind the button are smaller, dimmer and hidden where it covers them
-        const order = [...pieces].sort((a, b) => a.z - b.z)
-        for (const p of order) {
-          const depth = (p.z + 1) / 2
-          p.g += ((r ? 1.55 : 1) - p.g) * 0.12 // pieces grow while orbiting, shrink back to fit when reassembling
-          const s = r ? (0.72 + depth * 0.42) * p.g : p.g
-          let a = 0.45 + depth * 0.55
-          if (r && p.z < 0 && p.x > r.left && p.x < r.right && p.y > r.top && p.y < r.bottom) a *= 0.12
-          rctx.globalAlpha = a
-          rctx.save()
-          rctx.translate(p.x, p.y)
-          rctx.rotate(p.rot)
-          rctx.scale(s, s)
-          rctx.drawImage(p.cv, -p.cx * ds, -p.cy * ds, p.S * ds, p.S * ds)
-          rctx.restore()
-        }
-        rctx.globalAlpha = 1
-      }
+    ctx.imageSmoothingEnabled = true
+    const drawSprite = (img, w, alpha, flip) => {
+      if (!img.complete || !img.naturalWidth || alpha < 0.02) return
+      const h = (w * img.naturalHeight) / img.naturalWidth
+      ctx.save()
+      ctx.globalAlpha = alpha
+      ctx.translate(Math.round(pos.x), Math.round(pos.y))
+      if (flip) ctx.scale(-1, 1)
+      ctx.drawImage(img, -w / 2, -h / 2, w, h)
+      ctx.restore()
     }
-
-    if (mode === 'whole' && visible && rock.complete && rock.naturalWidth) {
-      // tumble in quarter turns so the pixel art stays crisp (free rotation would blur it)
-      const rs = Math.round(12 * scale)
-      const quarter = Math.round(angle / (Math.PI / 2)) * (Math.PI / 2)
-      rctx.save()
-      rctx.translate(Math.round(pos.x), Math.round(pos.y))
-      rctx.rotate(quarter)
-      rctx.drawImage(rock, -rs, -rs, rs * 2, rs * 2)
-      rctx.restore()
+    drawSprite(flyImg, FLY_W * scale, 1 - hoverMix, facing < 0)
+    drawSprite(hoverImg, HOVER_W * scale, hoverMix, false)
+    // the saucer's lights blink while it hovers
+    if (r && hoverImg.complete) {
+      ctx.globalAlpha = 0.6 + 0.4 * Math.sin(t * 8)
+      ctx.fillStyle = '#f6d65a'
+      const lw = HOVER_W * scale
+      for (let i = -1; i <= 1; i++) ctx.fillRect(Math.round(pos.x + i * lw * 0.28 - 1), Math.round(pos.y + hh * 0.02 - 1), 2, 2)
+      ctx.globalAlpha = 1
     }
   }
   frame()
 
   return {
-    /** snap onto a small interactive element (or pass null to release); `hover` just enlarges */
+    /** hover over a clickable element (or a virtual {getBoundingClientRect, isConnected}); null releases */
     setSnap(el, hover = !!el) {
-      if (el === snapEl) return
-      const prev = snapEl
-      snapEl = el
-      scaleT = el ? 1 : hover ? 1.6 : 1
-      if (el && pieces.length) {
-        if (mode === 'whole' || mode === 'gather') crash(el, !prev && mode === 'whole')
-        // already shattered on another button: the pieces simply fly over to the new one
-      } else if (!el && mode === 'orbit') {
-        mode = 'gather'
-        gatherT = performance.now()
-      }
+      target = el
+      scaleT = el ? 1 : hover ? 1.15 : 1
     },
     setHover(on) {
-      scaleT = on ? 1.6 : 1
+      scaleT = on ? 1.15 : 1
     },
-    /** re-enter the top layer so the asteroid stays above an open modal dialog */
+    /** re-enter the top layer so the cursor stays above an open modal dialog */
     raise() {
-      for (const cv of [dustCv, rockCv]) {
+      for (const cv of [dustCv, ufoCv]) {
         cv.hidePopover()
         cv.showPopover()
       }
