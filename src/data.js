@@ -51,7 +51,7 @@ export const projects = [
       'Distributed file binders, stationery kits and books',
     ],
     impact: [{ value: '~120', label: 'students reached' }],
-    gallery: [], // photos to be added: jakkur-independence-day-*.jpg
+    gallery: ['/img/jakkur-independence-day-classroom.jpg', '/img/jakkur-independence-day-march.jpg'],
     planet: { a: '#1b3a8a', b: '#f2d58a', c: '#fcf1d0', bands: 1, size: 0.46 },
   },
 
