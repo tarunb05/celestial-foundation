@@ -161,6 +161,9 @@ function fillPanel(i) {
   $('#plGallery').innerHTML = p.gallery.map((src) => `<a href="${p.link}" target="_blank" rel="noopener"><img src="${src}" alt="${p.title}" loading="lazy" /></a>`).join('')
   $('#plGallery').dataset.count = p.gallery.length
   $('#plLink').href = p.link
+  // placeholder orbits: no photos or Instagram link yet, just an invitation to get in touch
+  panel.classList.toggle('planet--placeholder', !!p.placeholder)
+  if (p.placeholder) $('#plGallery').innerHTML = ''
   panel.scrollTop = 0
 }
 

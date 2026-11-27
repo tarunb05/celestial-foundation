@@ -151,7 +151,8 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
     if (pl.parent == null) return
     const siblings = planets.filter((q) => q.parent === pl.parent)
     const j = siblings.indexOf(pl)
-    pl.radius = planets[pl.parent].size * 1.9 + j * 0.34
+    pl.moonBase = planets[pl.parent].size * 1.9 + j * 0.34
+    pl.radius = pl.moonBase
     pl.speed = 1.1 - j * 0.25
     pl.orbit.rotation.x = -pl.incline // matches the tilted plane used for the moon's position
   })
@@ -159,7 +160,7 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
   // ---------- Layout ----------
   const home = { pos: new THREE.Vector3(), target: new THREE.Vector3() }
   const cam = { pos: new THREE.Vector3(), target: new THREE.Vector3(), ox: 0, oy: 0 }
-  let mobile = false, W = 1, H = 1
+  let mobile = false, W = 1, H = 1, K = 1 // K: body size factor for crowded layouts
 
   function layout() {
     W = canvas.clientWidth
@@ -169,7 +170,7 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
     mobile = W / H < 0.9
     camera.fov = mobile ? 50 : 40
     const base = mobile ? 1.75 : 2.7
-    const outer = mobile ? 5.6 : 8.0 // outermost orbit, however many planets there are
+    const outer = mobile ? 5.6 : 8.4 // outermost orbit, however many planets there are
     const main = planets.filter((pl) => pl.parent == null)
     const gap = main.length > 1 ? Math.min(mobile ? 0.66 : 0.92, (outer - base) / (main.length - 1)) : 0
     const moonR = mobile ? 1.15 : 1.45
@@ -181,9 +182,16 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
       pl.phase = (k / main.length) * Math.PI * 2 + k * 0.7
       pl.orbit.scale.setScalar(pl.radius)
     })
-    planets.forEach((pl) => pl.parent != null && pl.orbit.scale.setScalar(pl.radius))
+    // with many planets on a small screen, shrink the bodies so neighbouring orbits don't collide
+    K = mobile ? 0.72 : main.length > 7 ? 0.9 : 1
+    planets.forEach((pl) => {
+      pl.hit.scale.setScalar(K)
+      if (pl.parent == null) return
+      pl.radius = pl.moonBase * K
+      pl.orbit.scale.setScalar(pl.radius)
+    })
     if (mobile) home.pos.set(0, 22, 9.5) // steeper, more top-down view uses the tall screen
-    else home.pos.set(0, 9.4, 17.5).multiplyScalar(THREE.MathUtils.clamp(1.6 / camera.aspect, 1, 1.5)) // pull back on narrower screens
+    else home.pos.set(0, 10, 18.6).multiplyScalar(THREE.MathUtils.clamp(1.6 / camera.aspect, 1, 1.5)) // pull back on narrower screens
     if (!focused) {
       cam.pos.copy(home.pos)
       cam.target.copy(home.target)
@@ -258,7 +266,7 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
       const out = pl.pos.clone().setY(0).normalize()
       const tangent = new THREE.Vector3(-out.z, 0, out.x)
       tmp.copy(out).multiplyScalar(-0.72).addScaledVector(tangent, 0.6).add(new THREE.Vector3(0, 0.36, 0)).normalize()
-      const d = pl.size * (mobile ? 6.2 : 5.2)
+      const d = pl.size * K * (mobile ? 6.2 : 5.2)
       const end = pl.pos.clone().addScaledVector(tmp, d)
       const dur = reduced ? 0 : 1.6
       gsap.to(cam.pos, { x: end.x, y: end.y, z: end.z, duration: dur, ease: 'expo.inOut' })
@@ -366,14 +374,14 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
       const on = i === hovered || i === focused ? 1 : 0
       pl.uniforms.uHover.value += (on - pl.uniforms.uHover.value) * 0.1
       const s = 1 + pl.uniforms.uHover.value * (focused === null ? 0.25 : 0)
-      pl.mesh.scale.setScalar(s)
+      pl.mesh.scale.setScalar(s * K)
       pl.orbit.material.opacity += ((i === hovered ? 0.9 : 0.28) - pl.orbit.material.opacity) * 0.1
       pl.orbit.material.color.set(i === hovered ? 0xd94a86 : 0x6f93a3)
 
       // label below the planet
       v.copy(pl.pos).project(camera)
       const dist = camera.position.distanceTo(pl.pos)
-      const rPx = ((pl.size * s) / dist) * (H / 2) / halfTan()
+      const rPx = ((pl.size * s * K) / dist) * (H / 2) / halfTan()
       const x = (v.x * 0.5 + 0.5) * W
       const y = (-v.y * 0.5 + 0.5) * H
       const behindMoon = dist > moonDist && Math.hypot(x - mx, y - my) < moonPx
