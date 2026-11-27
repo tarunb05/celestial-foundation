@@ -328,24 +328,7 @@ html.has-asteroid * { cursor: none !important; }
 .planet-label--moon.is-hover .planet-label__name { max-width: 220px; margin-left: 6px; }
 .planet-label--moon .planet-label__num { font-style: normal; font-size: 11px; }
 .planet-label__num { font-size: 13px; font-style: italic; color: var(--pink); }
-.planet-label__thumb {
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 10px);
-  width: 120px;
-  aspect-ratio: 4 / 5;
-  translate: -50% 10px;
-  border-radius: 12px;
-  overflow: hidden;
-  opacity: 0;
-  scale: 0.85;
-  pointer-events: none;
-  box-shadow: 0 20px 40px -10px rgb(0 0 0 / 0.5);
-  transition: opacity 0.35s, scale 0.45s cubic-bezier(0.3, 1.5, 0.5, 1), translate 0.45s;
-}
-.planet-label__thumb img { width: 100%; height: 100%; object-fit: cover; }
 .planet-label.is-hover { background: var(--crimson); border-color: var(--crimson); }
-.planet-label.is-hover .planet-label__thumb { opacity: 1; scale: 1; translate: -50% 0; }
 .planet-label.is-hover .planet-label__num { color: var(--cream); }
 .work__center {
   position: absolute;
@@ -543,7 +526,7 @@ html.has-asteroid * { cursor: none !important; }
   .work__head { top: 80px; }
   .work__head h2 { font-size: 32px; }
   .planet-label { padding: 4px 9px; font-size: 11px; }
-  .planet-label__name, .planet-label__thumb { display: none; }
+  .planet-label__name { display: none; }
   .planet {
     top: auto;
     left: 0;

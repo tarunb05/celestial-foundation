@@ -103,7 +103,7 @@ export function initAsteroidCursor() {
   // pixel-art asteroid sprite
   const rock = new Image()
   rock.src = '/img/asteroid.png'
-  const ROCK_PX = 34 // drawn size of the whole asteroid
+  const ROCK_PX = 24 // drawn size of the whole asteroid
   // pre-shattered sets: small targets break the asteroid into a few chunks, big ones into many
   const CHUNKS = [6, 10, 15, 22]
   let sets = {}
@@ -338,7 +338,7 @@ export function initAsteroidCursor() {
 
     if (mode === 'whole' && visible && rock.complete && rock.naturalWidth) {
       // tumble in quarter turns so the pixel art stays crisp (free rotation would blur it)
-      const rs = Math.round(17 * scale)
+      const rs = Math.round(12 * scale)
       const quarter = Math.round(angle / (Math.PI / 2)) * (Math.PI / 2)
       rctx.save()
       rctx.translate(Math.round(pos.x), Math.round(pos.y))

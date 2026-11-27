@@ -131,7 +131,7 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
     const label = document.createElement('button')
     label.className = `planet-label${isMoon ? ' planet-label--moon' : ''}`
     label.type = 'button'
-    label.innerHTML = `<span class="planet-label__num">${isMoon ? '☾' : String(planetNumber(projects, i)).padStart(2, '0')}</span><span class="planet-label__name">${p.title}</span><span class="planet-label__thumb"><img src="${p.gallery[0]}" alt="" loading="lazy" /></span>`
+    label.innerHTML = `<span class="planet-label__num">${isMoon ? '☾' : String(planetNumber(projects, i)).padStart(2, '0')}</span><span class="planet-label__name">${p.title}</span>`
     label.setAttribute('aria-label', `Explore ${p.title}`)
     labelsEl.appendChild(label)
 
@@ -153,7 +153,8 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
     const j = siblings.indexOf(pl)
     pl.moonBase = planets[pl.parent].size * 1.9 + j * 0.34
     pl.radius = pl.moonBase
-    pl.speed = 1.1 - j * 0.25
+    pl.speed = 0.9
+    pl.phase = (j / siblings.length) * Math.PI * 2 // moons of the same planet evenly spaced too
     pl.orbit.rotation.x = -pl.incline // matches the tilted plane used for the moon's position
   })
 
@@ -176,10 +177,17 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
     const moonR = mobile ? 1.15 : 1.45
     moon.scale.setScalar(moonR)
     halo.scale.setScalar(moonR * 6)
+    // evenly spaced: every planet gets its own equal slice of the circle, and neighbouring orbits are
+    // spread far apart (stepping through the slices by a number coprime to the count). They all turn
+    // at the same angular speed, so the spacing never bunches up.
+    const n = main.length
+    const gcd = (a, b) => (b ? gcd(b, a % b) : a)
+    let step = Math.max(1, Math.round(n * 0.45))
+    while (n > 1 && gcd(step, n) !== 1) step++
     main.forEach((pl, k) => {
       pl.radius = base + k * gap
-      pl.speed = 0.32 / Math.pow(pl.radius / base, 1.5)
-      pl.phase = (k / main.length) * Math.PI * 2 + k * 0.7
+      pl.speed = 0.16
+      pl.phase = (((k * step) % n) / n) * Math.PI * 2
       pl.orbit.scale.setScalar(pl.radius)
     })
     // with many planets on a small screen, shrink the bodies so neighbouring orbits don't collide
@@ -253,7 +261,19 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
   }
 
   const tmp = new THREE.Vector3()
+  const projV = new THREE.Vector3()
   const api = {
+    /** on-screen box of a planet/moon (client coords), so the cursor can crash into it like a button */
+    screenRect(i) {
+      const pl = planets[i]
+      const cr = canvas.getBoundingClientRect()
+      projV.copy(pl.pos).project(camera)
+      const x = cr.left + (projV.x * 0.5 + 0.5) * W
+      const y = cr.top + (-projV.y * 0.5 + 0.5) * H
+      const dist = camera.position.distanceTo(pl.pos)
+      const r = Math.max(10, ((pl.size * pl.mesh.scale.x) / dist) * (H / 2) / halfTan())
+      return { left: x - r, top: y - r, right: x + r, bottom: y + r, width: r * 2, height: r * 2 }
+    },
     focus(i) {
       if (focused === i) return
       focused = i

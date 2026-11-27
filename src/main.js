@@ -183,7 +183,12 @@ if (webgl) {
     labelsEl: $('#systemLabels'),
     centerLabel: $('#systemCenter'),
     reduced,
-    onHover: (i) => setCursor(i >= 0 ? 'Land ↘' : ''),
+    onHover: (i) => {
+      setCursor(i >= 0 ? 'Land ↘' : '')
+      // the asteroid crashes into the hovered planet/moon and its pieces orbit it (tracking it as it moves)
+      if (i >= 0) asteroid?.setSnap({ isConnected: true, getBoundingClientRect: () => system.screenRect(i) })
+      else asteroid?.setSnap(null, true)
+    },
     onFocus: (i) => {
       if (i === null) {
         panel.classList.remove('is-open')
