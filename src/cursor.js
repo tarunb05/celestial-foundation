@@ -16,63 +16,6 @@ function glowSprite([r, g, b], size = 64) {
   return c
 }
 
-function asteroidSprite(px) {
-  const c = document.createElement('canvas')
-  c.width = c.height = px
-  const g = c.getContext('2d')
-  const r = px * 0.42
-  g.translate(px / 2, px / 2)
-  const N = 13
-  const pts = Array.from({ length: N }, (_, i) => {
-    const a = (i / N) * TAU + (Math.random() - 0.5) * 0.3
-    const rr = r * (0.76 + Math.random() * 0.24)
-    return [Math.cos(a) * rr, Math.sin(a) * rr]
-  })
-  const outline = () => {
-    g.beginPath()
-    const mid = (p, q) => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2]
-    const s = mid(pts[N - 1], pts[0])
-    g.moveTo(s[0], s[1])
-    for (let i = 0; i < N; i++) {
-      const m = mid(pts[i], pts[(i + 1) % N])
-      g.quadraticCurveTo(pts[i][0], pts[i][1], m[0], m[1])
-    }
-    g.closePath()
-  }
-  outline()
-  const fill = g.createRadialGradient(-r * 0.35, -r * 0.4, r * 0.08, 0, 0, r * 1.15)
-  fill.addColorStop(0, '#fef4e8')
-  fill.addColorStop(0.45, '#cbb998')
-  fill.addColorStop(1, '#2f4c59')
-  g.fillStyle = fill
-  g.fill()
-  g.save()
-  outline()
-  g.clip()
-  for (const [x, y, cr] of [[-0.28, -0.18, 0.22], [0.32, 0.12, 0.17], [-0.05, 0.42, 0.13], [0.22, -0.4, 0.1], [-0.45, 0.25, 0.08]]) {
-    g.beginPath()
-    g.arc(x * r, y * r, cr * r, 0, TAU)
-    g.fillStyle = 'rgba(36,62,74,0.5)'
-    g.fill()
-    g.beginPath()
-    g.arc(x * r + cr * r * 0.22, y * r + cr * r * 0.22, cr * r * 0.62, 0, TAU)
-    g.fillStyle = 'rgba(254,244,232,0.16)'
-    g.fill()
-  }
-  const sh = g.createLinearGradient(-r, -r, r, r)
-  sh.addColorStop(0, 'rgba(12,49,66,0)')
-  sh.addColorStop(0.5, 'rgba(12,49,66,0)')
-  sh.addColorStop(1, 'rgba(12,49,66,0.7)')
-  g.fillStyle = sh
-  g.fillRect(-r * 1.2, -r * 1.2, r * 2.4, r * 2.4)
-  g.restore()
-  outline()
-  g.lineWidth = px * 0.014
-  g.strokeStyle = 'rgba(12,49,66,0.55)'
-  g.stroke()
-  return c
-}
-
 function makeLayer(cls) {
   const cv = document.createElement('canvas')
   cv.className = `asteroid-layer ${cls}`
@@ -112,7 +55,9 @@ export function initAsteroidCursor() {
   resize()
   window.addEventListener('resize', resize)
 
-  const rock = asteroidSprite(128)
+  // pixel-art asteroid sprite
+  const rock = new Image()
+  rock.src = '/img/asteroid.png'
   const glow = glowSprite([255, 120, 165])
   const spark = glowSprite([255, 226, 200])
 
@@ -218,11 +163,13 @@ export function initAsteroidCursor() {
     }
     rctx.globalAlpha = 1
     rctx.globalCompositeOperation = 'source-over'
-    if (visible) {
-      const rs = 13 * scale
+    if (visible && rock.complete && rock.naturalWidth) {
+      // tumble in quarter turns so the pixel art stays crisp (free rotation would blur it)
+      const rs = Math.round(17 * scale)
+      const quarter = Math.round(angle / (Math.PI / 2)) * (Math.PI / 2)
       rctx.save()
-      rctx.translate(pos.x, pos.y)
-      rctx.rotate(angle)
+      rctx.translate(Math.round(pos.x), Math.round(pos.y))
+      rctx.rotate(quarter)
       rctx.drawImage(rock, -rs, -rs, rs * 2, rs * 2)
       rctx.restore()
     }
