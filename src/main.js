@@ -48,7 +48,7 @@ $$('a[href^="#"]').forEach((a) =>
     const el = id === '#top' ? document.body : $(id)
     if (!el) return
     e.preventDefault()
-    scrollToEl(el)
+    scrollToEl(el, { force: true }) // force: scroll even if a planet had paused the page
   })
 )
 
@@ -229,6 +229,7 @@ if (webgl) {
       if (lenis) lenis.scrollTo('#work', { duration: 0.7, onComplete: () => system.focused !== null && lenis.stop() })
       else $('#work').scrollIntoView({ behavior: 'smooth' })
       setTimeout(() => {
+        if (system.focused !== i) return // left (nav click, Esc, back) before the panel appeared
         panel.classList.add('is-open')
         panel.setAttribute('aria-hidden', 'false')
         gsap.fromTo($$('.planet > *', panel), { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, stagger: 0.05, ease: 'power3.out' })
