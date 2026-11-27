@@ -142,6 +142,18 @@ ScrollTrigger.create({ start: 80, onToggle: (s) => $('#nav').classList.toggle('n
 }
 
 /* ---------------- Reveals ---------------- */
+// count-up numbers ("1,800+") when they scroll into view
+$$('[data-count]').forEach((el) => {
+  const end = +el.dataset.count
+  const n = { v: 0 }
+  gsap.to(n, {
+    v: end,
+    duration: reduced ? 0 : 2,
+    ease: 'power2.out',
+    scrollTrigger: { trigger: el, start: 'top 85%', once: true },
+    onUpdate: () => (el.textContent = `${Math.round(n.v).toLocaleString('en-IN')}+`),
+  })
+})
 $$('[data-reveal-words]').forEach((el) => {
   const words = el.textContent.trim().split(/\s+/)
   el.innerHTML = words.map((w) => `<span class="w">${w}</span>`).join(' ')

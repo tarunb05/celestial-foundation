@@ -301,6 +301,9 @@ html.has-asteroid * { cursor: none !important; }
 .mission__top { display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(40px, 6vw, 100px); align-items: center; margin-bottom: clamp(70px, 9vw, 120px); }
 .mission__statement { font-size: clamp(30px, 3.7vw, 60px); line-height: 1.1; margin: 26px 0 36px; }
 .mission__cta { gap: 10px; }
+.mission__stat { display: flex; align-items: center; gap: 18px; margin: -6px 0 30px; }
+.mission__stat-num { font-family: var(--serif); font-size: clamp(54px, 6vw, 92px); line-height: 0.9; color: var(--crimson); letter-spacing: -0.02em; }
+.mission__stat-label { font-family: var(--label); font-weight: 600; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.6; opacity: 0.75; padding-left: 18px; border-left: 1px solid rgb(13 28 66 / 0.25); }
 /* photo collage: three tilted prints and the moon seal */
 .mission__collage { position: relative; aspect-ratio: 1 / 1.05; max-width: 560px; justify-self: center; width: 100%; }
 .mc {
@@ -434,6 +437,8 @@ html.has-asteroid * { cursor: none !important; }
   transition: opacity 0.4s;
 }
 .work__center.is-hidden { opacity: 0; }
+.work__center { text-align: center; }
+.work__center span { display: block; margin-top: 6px; font-size: 9.5px; letter-spacing: 0.22em; color: var(--pink); }
 
 /* planet detail panel */
 .planet {
