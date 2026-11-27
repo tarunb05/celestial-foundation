@@ -63,7 +63,7 @@ export function initAsteroidCursor() {
 
   const mouse = { x: W / 2, y: H / 2 }
   const pos = { x: W / 2, y: H / 2 }
-  let visible = false, angle = 0, spinDir = 1, scale = 1, scaleT = 1, heat = 0, t = 0
+  let visible = false, angle = 0, spinDir = 1, scale = 1, scaleT = 1, heat = 0, t = 0, snapEl = null
   const sparks = []
 
   window.addEventListener('pointermove', (e) => {
@@ -83,8 +83,18 @@ export function initAsteroidCursor() {
     requestAnimationFrame(frame)
     t += 0.016
     const px = pos.x, py = pos.y
-    pos.x += (mouse.x - pos.x) * 0.35
-    pos.y += (mouse.y - pos.y) * 0.35
+    // snap: over a button/link the asteroid docks just outside its left edge (so the label stays
+    // readable), vertically centred, only slightly nudged by the mouse
+    let tx = mouse.x, ty = mouse.y
+    if (snapEl && snapEl.isConnected) {
+      const r = snapEl.getBoundingClientRect()
+      const cy = r.top + r.height / 2
+      tx = r.left - 17 * scaleT * 0.75 + (mouse.x - (r.left + r.width / 2)) * 0.06
+      ty = cy + (mouse.y - cy) * 0.12
+    }
+    const follow = snapEl ? 0.28 : 0.35
+    pos.x += (tx - pos.x) * follow
+    pos.y += (ty - pos.y) * follow
     const vx = pos.x - px, vy = pos.y - py
     const speed = Math.hypot(vx, vy)
     heat += (Math.min(speed / 22, 1) - heat) * 0.1
@@ -177,6 +187,12 @@ export function initAsteroidCursor() {
   frame()
 
   return {
+    /** snap onto a small interactive element (or pass null to release); `hover` just enlarges */
+    setSnap(el, hover = !!el) {
+      if (el && el !== snapEl) scale = 1.7 // little "pop" as it locks on
+      snapEl = el
+      scaleT = el ? 1.05 : hover ? 1.6 : 1
+    },
     setHover(on) {
       scaleT = on ? 1.6 : 1
     },

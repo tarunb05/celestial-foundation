@@ -213,7 +213,15 @@ if (useAsteroid) {
     xTo(e.clientX)
     yTo(e.clientY)
   })
-  document.addEventListener('pointerover', (e) => asteroid.setHover(!!e.target.closest('a, button, #systemCanvas')))
+  // snap onto small controls (buttons, links, planet labels); big cards and the 3D canvas just enlarge it
+  document.addEventListener('pointerover', (e) => {
+    const el = e.target.closest('a, button, [role=tab]')
+    if (el) {
+      const r = el.getBoundingClientRect()
+      const small = r.width < 380 && r.height < 120
+      asteroid.setSnap(small ? el : null, true)
+    } else asteroid.setSnap(null, !!e.target.closest('#systemCanvas'))
+  })
 } else {
   cursor.style.display = 'none'
 }
