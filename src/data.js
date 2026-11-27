@@ -1,118 +1,54 @@
-// Content sourced from @thecelestialfoundation Instagram posts.
+// Projects shown in the solar system.
 //
-// `impact` — fill in real numbers. A stat with value `null` shows as "—".
-//   e.g. impact: [{ value: '120', label: 'students reached' }, { value: '12', label: 'volunteers' }]
-// `planet` — how the project looks in the solar system (brand palette).
-// `moonOf` — set to the index of a main project to make this a small project: a tiny moon orbiting
-//   that planet. Main projects (no `moonOf`) are planets; the orbits re-space for any number of them.
+// `impact`  — stats shown in the project panel, e.g. [{ value: '150+', label: 'students reached' }].
+// `gallery` — photos in public/img (first one is the planet's preview).
+// `link`    — optional Instagram post; leave it out and the button is hidden.
+// `planet`  — how the project looks in the solar system (brand palette).
+// `moonOf`  — index of a planet: makes this a smaller project, shown as a tiny moon around that planet.
+// `placeholder: true` — an empty "Coming soon" orbit. Replace these one by one with real projects.
 export const projects = [
   {
-    title: 'The Spirit of Giving',
-    date: 'January 2026',
-    place: 'Government school, Horamavu',
-    partner: 'with Ektara',
-    desc: 'Small acts, big smiles. Because giving isn’t about how much you give — but how much love you put into it.',
+    title: 'Namma Soccer School',
+    date: '',
+    place: 'Bangalore',
+    partner: '',
+    desc: 'We supported students at Namma Soccer School by providing essential educational supplies, including stationery kits containing pencils, erasers and sharpeners, along with books and exam pads. This initiative aimed to equip over 150 students with the basic resources they need to support their learning and education.',
     did: [
-      'Visited a government school in Horamavu, Bangalore',
-      'Shared stationery with the students',
-      'Celebrated the season together with laughter and moments of joy',
-      'Partnered with Ektara to make it happen',
+      'Provided stationery kits with pencils, erasers and sharpeners',
+      'Donated books and exam pads',
+      'Equipped over 150 students with the basic resources they need to learn',
     ],
-    impact: [{ value: null, label: 'people impacted' }],
-    gallery: ['/img/spirit-of-giving.jpg'],
-    link: 'https://www.instagram.com/thecelestialfoundation/reel/DTfuP9jkto4/',
+    impact: [{ value: '150+', label: 'students reached' }],
+    gallery: ['/img/namma-soccer-school-group.jpg', '/img/namma-soccer-school-classroom.jpg', '/img/namma-soccer-school-smiles.jpg'],
     planet: { a: '#22396f', b: '#f2d58a', c: '#0d1c42', bands: 1, size: 0.52 },
   },
+
   {
-    title: 'Menstrual Awareness Session',
-    date: 'December 2025',
-    place: 'Kalkere Government School',
-    partner: 'with Ektara',
-    desc: 'A beautiful day of beautiful work — an open, judgement-free conversation about periods.',
+    title: 'United Way Bangalore School',
+    date: '',
+    place: 'Learning Essentials Initiative',
+    partner: 'with United Way Bengaluru',
+    desc: 'We provided young learners under the age of 7 with essential learning materials, including multiple boxes of chalk and individual chalk slates. The initiative aimed to make early learning more accessible, interactive and enjoyable. The children also warmly welcomed us by sharing homemade chikki, making the experience especially memorable.',
     did: [
-      'Ran a menstrual awareness session at Kalkere Government School',
-      'Helped students talk openly about periods and menstrual health',
-      'Worked to normalise menstruation and break the stigma around it',
-      'Partnered with Ektara',
+      'Provided multiple boxes of chalk and individual chalk slates',
+      'Made early learning more accessible, interactive and enjoyable',
+      'Were warmly welcomed by the children with homemade chikki',
     ],
-    impact: [{ value: null, label: 'people impacted' }],
-    gallery: ['/img/kalkere.jpg'],
-    link: 'https://www.instagram.com/_ektara._/reel/DSmV27XEkQ8/',
-    planet: { a: '#0d1c42', b: '#8fa6dd', c: '#fcf1d0', bands: 0, size: 0.44 },
-  },
-  {
-    title: 'Day of Technology',
-    date: 'August 2025',
-    place: 'Government school, Bangalore',
-    partner: 'with Ms. Poornima',
-    desc: 'Access to technology is essential for quality education and digital empowerment.',
-    did: [
-      'Donated a laptop to a government school on the Day of Technology',
-      'Supported Ms. Poornima, who teaches the children digital literacy',
-      'Helped equip students with skills to thrive in a digital world',
-    ],
-    impact: [
-      { value: '1', label: 'laptop donated' },
-      { value: null, label: 'people impacted' },
-    ],
-    gallery: ['/img/laptop.jpg'],
-    link: 'https://www.instagram.com/thecelestialfoundation/p/DNCOCGftaUb/',
-    planet: { a: '#1b3a8a', b: '#7fb0ff', c: '#fcf1d0', bands: 0, size: 0.46 },
-  },
-  {
-    title: 'Advaya Summer Camp',
-    date: 'May 2024',
-    place: 'Advaya Foundation, Bangalore',
-    partner: 'with Advaya Foundation',
-    desc: 'Where smiles grow and memories remain.',
-    did: [
-      'Teamed up with Advaya Foundation to run a summer camp for children',
-      'Called on volunteers to create magical memories for young adventurers',
-      'Spent the camp exploring, learning and laughing together',
-    ],
-    impact: [{ value: null, label: 'people impacted' }],
-    gallery: ['/img/advaya-2.jpg', '/img/advaya-1.jpg', '/img/camp-poster-1.jpg', '/img/camp-poster-2.jpg'],
-    link: 'https://www.instagram.com/thecelestialfoundation/reel/C63MHoZy4fH/',
-    planet: { a: '#e8d6a6', b: '#fcf1d0', c: '#22396f', bands: 1, size: 0.6, ring: true },
-  },
-  {
-    title: 'Busting Period Myths',
-    date: 'May 2024',
-    place: 'Online video series',
-    partner: 'with Ektara',
-    desc: '“Menstruating women can cure the plague?” Taking on period myths, one at a time.',
-    did: [
-      'Created a myth-busting video series with Ektara',
-      'Took on the myths and taboos that still surround menstruation',
-      'Reached audiences online to spark honest conversations',
-    ],
-    impact: [{ value: null, label: 'people impacted' }],
-    gallery: ['/img/period-myths.jpg'],
-    link: 'https://www.instagram.com/_ektara._/reel/C6qbiRkMqZX/',
-    planet: { a: '#22396f', b: '#b9c8ee', c: '#010736', bands: 1, size: 0.4 },
-  },
-  {
-    title: 'Guess the Period Product',
-    date: 'May 2024',
-    place: 'Street-style video',
-    partner: 'with Ektara',
-    desc: 'A playful game to get people talking about the products — and conversations — that too often stay hidden.',
-    did: [
-      'Filmed a street-style “guess the period product” game with Ektara',
-      'Got people talking openly about menstrual products',
-    ],
-    impact: [{ value: null, label: 'people impacted' }],
-    gallery: ['/img/period-products.jpg'],
-    link: 'https://www.instagram.com/_ektara._/reel/C7Omx84SK1z/',
-    planet: { a: '#f2d58a', b: '#fcf1d0', c: '#22396f', bands: 0, size: 0.34 },
+    impact: [{ value: 'Under 7', label: 'young learners supported' }],
+    gallery: ['/img/united-way-group.jpg', '/img/united-way-slates.jpg', '/img/united-way-children.jpg', '/img/united-way-sign.jpg'],
+    planet: { a: '#0d1c42', b: '#8fa6dd', c: '#fcf1d0', bands: 0, size: 0.48 },
   },
 
-  // ---- Placeholders: replace with real projects (keep `placeholder: true` off once filled in) ----
+  // ---- Placeholders: empty orbits, filled in one by one ----
   ...[
+    { a: '#1b3a8a', b: '#7fb0ff', c: '#fcf1d0', bands: 0, size: 0.46 },
+    { a: '#e8d6a6', b: '#fcf1d0', c: '#22396f', bands: 1, size: 0.6, ring: true },
+    { a: '#22396f', b: '#b9c8ee', c: '#010736', bands: 1, size: 0.4 },
+    { a: '#f2d58a', b: '#fcf1d0', c: '#22396f', bands: 0, size: 0.34 },
     { a: '#2a4a8f', b: '#a9c0f0', c: '#0d1c42', bands: 1, size: 0.46 },
     { a: '#c8a65e', b: '#f6e3b0', c: '#0d1c42', bands: 0, size: 0.38 },
     { a: '#5b6fae', b: '#dfe6ff', c: '#010736', bands: 1, size: 0.5 },
-  ].map((planet, k) => placeholder(`Project ${String(7 + k).padStart(2, '0')}`, planet)),
+  ].map((planet, k) => placeholder(`Project ${String(3 + k).padStart(2, '0')}`, planet)),
   // tiny moons for smaller projects (moonOf = index of the planet they circle)
   placeholder('Small project', { a: '#a9c0f0', b: '#fcf1d0', c: '#22396f', bands: 0, size: 0.13 }, 0),
   placeholder('Small project', { a: '#f2d58a', b: '#fcf1d0', c: '#22396f', bands: 0, size: 0.12 }, 3),
@@ -130,7 +66,6 @@ function placeholder(title, planet, moonOf) {
     did: ['Details coming soon'],
     impact: [],
     gallery: ['/img/logo.png'],
-    link: 'https://www.instagram.com/thecelestialfoundation/',
     ...(moonOf != null ? { moonOf } : {}),
     planet,
   }

@@ -38,8 +38,12 @@ if (!reduced) {
   gsap.ticker.lagSmoothing(0)
 }
 const scrollToEl = (el, opts = {}) => (lenis ? lenis.scrollTo(el, { duration: 1.4, ...opts }) : el.scrollIntoView({ behavior: 'smooth' }))
+let systemApi = null // the solar system, once created
 $$('a[href^="#"]').forEach((a) =>
   a.addEventListener('click', (e) => {
+    // inside a planet the page scroll is paused: leave the planet first so the nav can move the page
+    if (systemApi && systemApi.focused !== null) systemApi.blur()
+    lenis?.start()
     const id = a.getAttribute('href')
     const el = id === '#top' ? document.body : $(id)
     if (!el) return
@@ -57,19 +61,23 @@ let heroApi = null // set once the hero scene exists; the loader exit flies its 
   gsap.set('#loaderName span', { yPercent: 110 })
   const galaxy = initGalaxy($('#loaderSky'), { reduced, center: $('#loaderMoon') })
   gsap.fromTo(galaxy.state, { zoom: 0.7 }, { zoom: 0.85, duration: 2.2, ease: 'power3.out' }) // sky drifts in while loading
-  const ready = Promise.all([
-    document.fonts.ready,
-    new Promise((r) => (document.readyState === 'complete' ? r() : window.addEventListener('load', r, { once: true }))),
-    $('#loaderLogo').decode().catch(() => {}),
-  ])
+  // A reload in the same browser session gets a quick intro; the first visit gets the full (but brisker) show.
+  let seen = false
+  try {
+    seen = sessionStorage.getItem('cf-intro-seen') === '1'
+    sessionStorage.setItem('cf-intro-seen', '1')
+  } catch {}
+  const SPEED = reduced ? 1 : seen ? 2.4 : 1.35 // timeline speed-up for the logo reveal + warp
+  // only wait for what the intro shows (fonts + logo), not every image on the page
+  const ready = Promise.all([document.fonts.ready, $('#loaderLogo').decode().catch(() => {})])
   let isReady = false
   ready.then(() => (isReady = true))
-  setTimeout(() => (isReady = true), 5000) // never hang
+  setTimeout(() => (isReady = true), seen ? 1200 : 2500) // never hang
 
   const shown = { v: 0 }
   gsap.to(shown, {
     v: 100,
-    duration: reduced ? 0.01 : 1.5,
+    duration: reduced ? 0.01 : seen ? 0.35 : 0.9,
     ease: 'power2.inOut',
     onUpdate() {
       const v = isReady ? shown.v : Math.min(shown.v, 90)
@@ -102,6 +110,7 @@ let heroApi = null // set once the hero scene exists; the loader exit flies its 
       .set('#loader', { display: 'none', onComplete: () => galaxy.stop() }, 'warp+=1.65')
       .from('.hero__title .line > span', { yPercent: 110, duration: 1.2, stagger: 0.12, ease: 'expo.out' }, 'warp+=1.5')
       .from('.hero__eyebrow, .hero__sub, .hero__actions, .hero__scroll, .nav', { opacity: 0, y: 20, duration: 0.9, stagger: 0.08, ease: 'power3.out', clearProps: 'opacity,transform' }, 'warp+=1.8')
+    tl.timeScale(SPEED)
     if (reduced) tl.progress(1)
   }
 }
@@ -150,17 +159,19 @@ const pad = (n) => String(n).padStart(2, '0')
 const panel = $('#planet')
 function fillPanel(i) {
   const p = projects[i]
-  $('#plEyebrow').textContent = p.moonOf != null ? `Moon of ${projects[p.moonOf].title} · ${p.date}` : `Planet ${pad(planetNumber(projects, i))} · ${p.date}`
+  const join = (...parts) => parts.filter(Boolean).join(' · ') // skip empty fields (no date / partner yet)
+  $('#plEyebrow').textContent = join(p.moonOf != null ? `Moon of ${projects[p.moonOf].title}` : `Planet ${pad(planetNumber(projects, i))}`, p.date)
   $('#plTitle').textContent = p.title
-  $('#plMeta').textContent = `${p.place} · ${p.partner}`
+  $('#plMeta').textContent = join(p.place, p.partner)
   $('#plDesc').textContent = p.desc
   $('#plImpact').innerHTML = p.impact
     .map((s) => `<div class="stat ${s.value == null ? 'stat--empty' : ''}"><span class="stat__num">${s.value ?? '—'}</span><span class="stat__label">${s.label}</span></div>`)
     .join('')
   $('#plDid').innerHTML = p.did.map((d) => `<li>${d}</li>`).join('')
-  $('#plGallery').innerHTML = p.gallery.map((src) => `<a href="${p.link}" target="_blank" rel="noopener"><img src="${src}" alt="${p.title}" loading="lazy" /></a>`).join('')
+  $('#plGallery').innerHTML = p.gallery.map((src) => `<a href="${p.link || src}" target="_blank" rel="noopener"><img src="${src}" alt="${p.title}" loading="lazy" /></a>`).join('')
   $('#plGallery').dataset.count = p.gallery.length
-  $('#plLink').href = p.link
+  $('#plLink').href = p.link || '#'
+  $('#plLink').hidden = !p.link // no Instagram post yet → no button
   // placeholder orbits: no photos or Instagram link yet, just an invitation to get in touch
   panel.classList.toggle('planet--placeholder', !!p.placeholder)
   if (p.placeholder) $('#plGallery').innerHTML = ''
@@ -169,10 +180,10 @@ function fillPanel(i) {
 
 $('#workList').innerHTML = projects
   .map(
-    (p, i) => `<li class="wlist"><a href="${p.link}" target="_blank" rel="noopener">
+    (p, i) => `<li class="wlist"><a href="${p.link || p.gallery[0]}" target="_blank" rel="noopener">
       <img src="${p.gallery[0]}" alt="${p.title}" loading="lazy" />
       <span class="wlist__num">${pad(i + 1)}</span>
-      <span class="wlist__meta">${p.date} · ${p.place}</span>
+      <span class="wlist__meta">${[p.date, p.place].filter(Boolean).join(' · ')}</span>
       <span class="wlist__title">${p.title}</span>
       <span class="wlist__desc">${p.did.join(' · ')}</span></a></li>`
   )
@@ -184,7 +195,7 @@ if (webgl) {
     centerLabel: $('#systemCenter'),
     reduced,
     onHover: (i) => {
-      setCursor(i >= 0 ? 'Land ↘' : '')
+      setCursor(i >= 0 ? 'Land' : '')
       // the asteroid crashes into the hovered planet/moon and its pieces orbit it (tracking it as it moves)
       if (i >= 0) asteroid?.setSnap({ isConnected: true, getBoundingClientRect: () => system.screenRect(i) })
       else asteroid?.setSnap(null, true)
@@ -209,6 +220,7 @@ if (webgl) {
       }, reduced ? 0 : 900)
     },
   })
+  systemApi = system
   $('#planetBack').addEventListener('click', () => system.blur())
   // if the page gets scrolled away while a planet is open, return to the orbit view
   new IntersectionObserver(([e]) => !e.isIntersecting && system.focused !== null && system.blur(), { threshold: 0.35 }).observe($('#work'))

@@ -17,6 +17,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@1,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet" />
   </head>
   <body>
+    <!-- Icon set (line icons, drawn for this site). Use: <svg class="i"><use href="#i-name" /></svg> -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" /></symbol>
+      <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9" /></symbol>
+      <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></symbol>
+      <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6" /></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></symbol>
+      <symbol id="i-instagram" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.3" cy="6.7" r="0.9" fill="currentColor" stroke="none" /></symbol>
+      <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M4 20.5l1.3-4.1A8.5 8.5 0 1 1 8.2 19.3z" /><path d="M9.2 8.6c.2 2.9 2.5 5.2 5.4 5.6l1.1-1.3 1.8.8-.4 1.7c-3.6.3-7.7-3.6-7.6-7.4l1.7-.5.8 1.9z" /></symbol>
+      <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5.2 3.5h3.1l1.6 4.2-2.1 1.4a11.3 11.3 0 0 0 7.1 7.1l1.4-2.1 4.2 1.6v3.1a2 2 0 0 1-2.2 2A16.6 16.6 0 0 1 3.2 5.7a2 2 0 0 1 2-2.2z" /></symbol>
+      <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 2.5c.7 5 3.5 8.3 9 9.5-5.5 1.2-8.3 4.5-9 9.5-.7-5-3.5-8.3-9-9.5 5.5-1.2 8.3-4.5 9-9.5z" fill="currentColor" stroke="none" /></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.6A8.3 8.3 0 1 1 9.4 4a6.6 6.6 0 0 0 10.6 10.6z" /></symbol>
+      <symbol id="i-book" viewBox="0 0 24 24"><path d="M2.5 5.5c3.3-1.2 6.4-1 9.5 1 3.1-2 6.2-2.2 9.5-1v13c-3.3-1.2-6.4-1-9.5 1-3.1-2-6.2-2.2-9.5-1zM12 6.5v13" /></symbol>
+      <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.4A4.1 4.1 0 0 1 12 7.2a4.1 4.1 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20z" /></symbol>
+      <symbol id="i-laptop" viewBox="0 0 24 24"><rect x="4.5" y="4.5" width="15" height="10.5" rx="1.5" /><path d="M2 19h20M10 17h4" /></symbol>
+      <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2" /><path d="M2.8 20c0-3.5 2.8-6.2 6.2-6.2s6.2 2.7 6.2 6.2" /><circle cx="17" cy="9" r="2.6" /><path d="M15.6 14.3A5.2 5.2 0 0 1 21.2 19.6" /></symbol>
+      <symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="8.5" width="18" height="4.5" rx="1" /><path d="M5 13v8h14v-8M12 8.5V21M12 8.5C10.4 4.6 6.4 4.6 6.6 7c.2 1.6 3.4 1.5 5.4 1.5zm0 0c1.6-3.9 5.6-3.9 5.4-1.5-.2 1.6-3.4 1.5-5.4 1.5z" /></symbol>
+      <symbol id="i-hand" viewBox="0 0 24 24"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11.5M11 11V4.5a1.5 1.5 0 0 1 3 0V11.5M14 11.5V6a1.5 1.5 0 0 1 3 0v7.5c0 4-2.8 7-6.6 7-3.2 0-5.4-2.2-6.4-5.2l-1-3a1.5 1.5 0 0 1 2.8-1L8 13" /></symbol>
+    </svg>
+
     <!-- Loader -->
     <div class="loader" id="loader" aria-hidden="true">
       <canvas class="loader__sky" id="loaderSky"></canvas>
@@ -68,29 +88,43 @@
       <!-- MARQUEE -->
       <div class="marquee" aria-hidden="true">
         <div class="marquee__track">
-          <span>Education</span><i>✦</i><span>Menstrual health</span><i>✦</i><span>Digital literacy</span><i>✦</i><span>The spirit of giving</span><i>✦</i><span>Summer camps</span><i>✦</i>
-          <span>Education</span><i>✦</i><span>Menstrual health</span><i>✦</i><span>Digital literacy</span><i>✦</i><span>The spirit of giving</span><i>✦</i><span>Summer camps</span><i>✦</i>
+          <span>Education</span><svg class="i"><use href="#i-sparkle" /></svg><span>Menstrual health</span><svg class="i"><use href="#i-sparkle" /></svg><span>Digital literacy</span><svg class="i"><use href="#i-sparkle" /></svg><span>The spirit of giving</span><svg class="i"><use href="#i-sparkle" /></svg><span>Summer camps</span><svg class="i"><use href="#i-sparkle" /></svg>
+          <span>Education</span><svg class="i"><use href="#i-sparkle" /></svg><span>Menstrual health</span><svg class="i"><use href="#i-sparkle" /></svg><span>Digital literacy</span><svg class="i"><use href="#i-sparkle" /></svg><span>The spirit of giving</span><svg class="i"><use href="#i-sparkle" /></svg><span>Summer camps</span><svg class="i"><use href="#i-sparkle" /></svg>
         </div>
       </div>
 
       <!-- MISSION -->
       <section class="mission" id="mission">
-        <p class="eyebrow eyebrow--dark">( Our mission )</p>
-        <p class="mission__statement" data-reveal-words>
-          Small acts. Big smiles. We show up at government schools and communities across Bangalore — sharing stationery, donating technology, breaking the silence around periods and running camps where smiles grow and memories remain.
-        </p>
+        <div class="mission__top">
+          <div class="mission__copy">
+            <p class="eyebrow eyebrow--dark">( Our mission )</p>
+            <p class="mission__statement" data-reveal-words>
+              Small acts. Big smiles. We show up at government schools and communities across Bangalore — sharing stationery, donating technology, breaking the silence around periods and running camps where smiles grow and memories remain.
+            </p>
+            <a class="btn btn--dark mission__cta" href="#work">See what we’ve done <svg class="i"><use href="#i-arrow-right" /></svg></a>
+          </div>
+          <div class="mission__collage" aria-hidden="true">
+            <figure class="mc mc--1"><img src="/img/namma-soccer-school-classroom.jpg" alt="" loading="lazy" /><figcaption>Namma Soccer School</figcaption></figure>
+            <figure class="mc mc--2"><img src="/img/laptop.jpg" alt="" loading="lazy" /><figcaption>Digital literacy</figcaption></figure>
+            <figure class="mc mc--3"><img src="/img/namma-soccer-school-group.jpg" alt="" loading="lazy" /><figcaption>150+ students reached</figcaption></figure>
+            <span class="mc__seal"><img src="/img/logo-192.png" alt="" /></span>
+          </div>
+        </div>
         <div class="pillars">
           <article class="pillar">
+            <span class="pillar__icon"><svg class="i"><use href="#i-book" /></svg></span>
             <span class="pillar__num">01</span>
             <h3>Education for all</h3>
             <p>Stationery drives, learning camps and classroom support for children in government schools.</p>
           </article>
           <article class="pillar">
+            <span class="pillar__icon"><svg class="i"><use href="#i-heart" /></svg></span>
             <span class="pillar__num">02</span>
             <h3>Health &amp; dignity</h3>
             <p>Menstrual awareness sessions and myth-busting campaigns that normalise conversations about periods.</p>
           </article>
           <article class="pillar">
+            <span class="pillar__icon"><svg class="i"><use href="#i-laptop" /></svg></span>
             <span class="pillar__num">03</span>
             <h3>Digital empowerment</h3>
             <p>Getting technology into classrooms so every child can build the skills to thrive in a digital world.</p>
@@ -110,7 +144,7 @@
         <p class="work__hint">Drag to explore · <span class="hint--fine">Scroll to zoom · </span><span class="hint--fine">Click</span><span class="hint--touch">Tap</span> a planet to land</p>
 
         <aside class="planet" id="planet" aria-hidden="true" data-lenis-prevent>
-          <button class="planet__back" id="planetBack">← Back to orbit</button>
+          <button class="planet__back" id="planetBack"><svg class="i"><use href="#i-arrow-left" /></svg> Back to orbit</button>
           <p class="planet__eyebrow" id="plEyebrow"></p>
           <h3 class="planet__title" id="plTitle"></h3>
           <p class="planet__meta" id="plMeta"></p>
@@ -119,7 +153,7 @@
           <h4 class="planet__h">What we did</h4>
           <ul class="planet__did" id="plDid"></ul>
           <div class="planet__gallery" id="plGallery"></div>
-          <a class="planet__link" id="plLink" href="#" target="_blank" rel="noopener">See it on Instagram ↗</a>
+          <a class="planet__link" id="plLink" href="#" target="_blank" rel="noopener"><svg class="i"><use href="#i-instagram" /></svg> View on Instagram</a>
           <button class="btn btn--crimson planet__cta" data-open-contact="collab">Help make this project happen</button>
         </aside>
 
@@ -129,51 +163,52 @@
 
       <!-- GET INVOLVED -->
       <section class="involved" id="involved">
-        <p class="eyebrow">( Get involved )</p>
-        <h2 class="involved__title">Your energy <em>counts.</em></h2>
+        <div class="involved__head">
+          <div>
+            <p class="eyebrow">( Get involved )</p>
+            <h2 class="involved__title">Your energy <em>counts.</em></h2>
+          </div>
+          <p class="involved__lede">Three ways to join our orbit. Pick one and send us a message — we usually reply within a day.</p>
+        </div>
         <div class="ways">
           <button class="way" data-open-contact="collab">
-            <span class="way__num">01</span>
+            <span class="way__top"><span class="way__icon"><svg class="i"><use href="#i-users" /></svg></span><span class="way__num">01</span></span>
             <span class="way__name">Collaborate</span>
             <span class="way__desc">Schools, NGOs, brands and creators — let’s build the next project together.</span>
-            <span class="way__arrow">→</span>
+            <span class="way__go">Start a conversation <svg class="i"><use href="#i-arrow-right" /></svg></span>
           </button>
           <button class="way" data-open-contact="fundraise">
-            <span class="way__num">02</span>
+            <span class="way__top"><span class="way__icon"><svg class="i"><use href="#i-gift" /></svg></span><span class="way__num">02</span></span>
             <span class="way__name">Fundraise</span>
-            <span class="way__desc">Sponsor a stationery drive, a laptop, or a whole summer camp.</span>
-            <span class="way__arrow">→</span>
+            <span class="way__desc">Sponsor a stationery drive, a laptop for a classroom, or a whole summer camp.</span>
+            <span class="way__go">Help us fund it <svg class="i"><use href="#i-arrow-right" /></svg></span>
           </button>
           <button class="way" data-open-contact="volunteer">
-            <span class="way__num">03</span>
+            <span class="way__top"><span class="way__icon"><svg class="i"><use href="#i-hand" /></svg></span><span class="way__num">03</span></span>
             <span class="way__name">Volunteer</span>
             <span class="way__desc">Join us on the ground and create magical memories with young adventurers.</span>
-            <span class="way__arrow">→</span>
+            <span class="way__go">Join the crew <svg class="i"><use href="#i-arrow-right" /></svg></span>
           </button>
         </div>
         <div class="involved__contact">
-          <p>Or just call us</p>
-          <a href="tel:+916360771754" class="involved__phone">+91 63607 71754</a>
+          <p>Prefer to talk?</p>
+          <div class="involved__btns">
+            <a class="btn btn--crimson" href="https://wa.me/916360771754?text=Hi%20Celestial%20Foundation!" target="_blank" rel="noopener"><svg class="i"><use href="#i-whatsapp" /></svg> WhatsApp us</a>
+            <a class="btn btn--ghost" href="tel:+916360771754"><svg class="i"><use href="#i-phone" /></svg> +91 63607 71754</a>
+            <a class="icon-btn" href="https://www.instagram.com/thecelestialfoundation/" target="_blank" rel="noopener" aria-label="The Celestial Foundation on Instagram"><svg class="i"><use href="#i-instagram" /></svg></a>
+          </div>
         </div>
-      </section>
-
-      <section class="partners">
-        <p class="eyebrow eyebrow--dark">( In good company )</p>
-        <ul class="partners__list">
-          <li><a href="https://www.instagram.com/_ektara._/" target="_blank" rel="noopener">Ektara</a></li>
-          <li><span>Advaya Foundation</span></li>
-          <li><span>Government schools of Bangalore</span></li>
-        </ul>
       </section>
     </main>
 
     <footer class="footer">
       <div class="footer__big">Celestial</div>
       <div class="footer__row">
-        <p>The Celestial Foundation<br />Registered Non-Profit · Education &amp; Social Development<br />📍 Bangalore, India</p>
-        <ul>
-          <li><a href="https://www.instagram.com/thecelestialfoundation/" target="_blank" rel="noopener">Instagram ↗</a></li>
-          <li><a href="tel:+916360771754">+91 63607 71754</a></li>
+        <p>The Celestial Foundation<br />Registered Non-Profit · Education &amp; Social Development<br /><span class="footer__place"><svg class="i"><use href="#i-pin" /></svg> Bangalore, India</span></p>
+        <ul class="footer__links">
+          <li><a href="tel:+916360771754" class="footer__phone"><svg class="i"><use href="#i-phone" /></svg> +91 63607 71754</a></li>
+          <li><a class="icon-btn" href="https://wa.me/916360771754" target="_blank" rel="noopener" aria-label="Message us on WhatsApp"><svg class="i"><use href="#i-whatsapp" /></svg></a></li>
+          <li><a class="icon-btn" href="https://www.instagram.com/thecelestialfoundation/" target="_blank" rel="noopener" aria-label="The Celestial Foundation on Instagram"><svg class="i"><use href="#i-instagram" /></svg></a></li>
         </ul>
       </div>
       <p class="footer__small">© <span id="year"></span> The Celestial Foundation. Made with love under the same sky.</p>
@@ -181,7 +216,7 @@
 
     <!-- Contact dialog -->
     <dialog class="contact" id="contact" aria-labelledby="contactTitle">
-      <button class="contact__close" id="contactClose" aria-label="Close">✕</button>
+      <button class="contact__close" id="contactClose" aria-label="Close"><svg class="i"><use href="#i-x" /></svg></button>
       <p class="eyebrow eyebrow--dark">( Say hello )</p>
       <h2 id="contactTitle">How would you like to <em>help?</em></h2>
       <div class="contact__tabs" role="tablist">
@@ -191,8 +226,8 @@
       </div>
       <p class="contact__blurb" id="contactBlurb"></p>
       <div class="contact__actions">
-        <a class="btn btn--crimson" id="contactWa" href="#" target="_blank" rel="noopener">Message on WhatsApp</a>
-        <a class="btn btn--outline" href="tel:+916360771754">Call +91 63607 71754</a>
+        <a class="btn btn--crimson" id="contactWa" href="#" target="_blank" rel="noopener"><svg class="i"><use href="#i-whatsapp" /></svg> Message on WhatsApp</a>
+        <a class="btn btn--outline" href="tel:+916360771754"><svg class="i"><use href="#i-phone" /></svg> Call +91 63607 71754</a>
       </div>
     </dialog>
 

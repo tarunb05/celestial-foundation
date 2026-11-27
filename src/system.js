@@ -131,7 +131,7 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
     const label = document.createElement('button')
     label.className = `planet-label${isMoon ? ' planet-label--moon' : ''}`
     label.type = 'button'
-    label.innerHTML = `<span class="planet-label__num">${isMoon ? '☾' : String(planetNumber(projects, i)).padStart(2, '0')}</span><span class="planet-label__name">${p.title}</span>`
+    label.innerHTML = `<span class="planet-label__num">${isMoon ? '<svg class="i"><use href="#i-moon" /></svg>' : String(planetNumber(projects, i)).padStart(2, '0')}</span><span class="planet-label__name">${p.title}</span>`
     label.setAttribute('aria-label', `Explore ${p.title}`)
     labelsEl.appendChild(label)
 
