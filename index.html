@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Celestial Foundation — We provide for those in need</title>
+    <meta name="description" content="The Celestial Foundation is a registered non-profit for education and social development in Bangalore, India. Collaborate, fundraise or volunteer with us." />
+    <meta name="theme-color" content="#13445A" />
+    <meta property="og:title" content="The Celestial Foundation" />
+    <meta property="og:description" content="Small acts. Big smiles. A registered non-profit for education & social development in Bangalore." />
+    <meta property="og:image" content="/img/spirit-of-giving.jpg" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- Loader -->
+    <div class="loader" id="loader" aria-hidden="true">
+      <div class="loader__moon"><span class="loader__fill" id="loaderFill"></span></div>
+      <p class="loader__count"><span id="loaderCount">0</span>%</p>
+    </div>
+
+    <div class="grain" aria-hidden="true"></div>
+    <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor__label" id="cursorLabel"></span></div>
+
+    <header class="nav" id="nav">
+      <a href="#top" class="nav__brand" aria-label="The Celestial Foundation home">
+        <svg class="mark" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="30" fill="#13445A" />
+          <circle cx="32" cy="32" r="23" fill="#FEF4E8" />
+          <circle cx="25" cy="24" r="5" fill="#E9D9B8" />
+          <circle cx="38" cy="20" r="3" fill="#E9D9B8" />
+          <circle cx="40" cy="33" r="4" fill="#E9D9B8" />
+          <path d="M9 44c5-6 9-2 12-7 2 5 6 4 9 0 2 5 7 5 10 0 2 4 6 4 9-1 3 4 5 5 7 7-6 12-17 15-24 15S14 54 9 44z" fill="#13445A" />
+        </svg>
+        <span>The Celestial<br />Foundation</span>
+      </a>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="#mission">Mission</a>
+        <a href="#projects">Projects</a>
+        <a href="#moments">Moments</a>
+        <a href="#involved">Get involved</a>
+      </nav>
+      <button class="btn btn--crimson nav__cta" data-open-contact>Contact us</button>
+    </header>
+
+    <main id="top">
+      <!-- HERO -->
+      <section class="hero" id="hero">
+        <canvas class="hero__canvas" id="heroCanvas" aria-hidden="true"></canvas>
+        <div class="hero__inner">
+          <p class="eyebrow hero__eyebrow"><span class="dot"></span> Registered Non-Profit · Bangalore, India</p>
+          <h1 class="hero__title">
+            <span class="line"><span>We provide</span></span>
+            <span class="line"><span>for those <em>in need.</em></span></span>
+          </h1>
+          <div class="hero__foot">
+            <p class="hero__sub">Education &amp; social development, focused on sustainable community impact — one government school, one smile, one small act at a time.</p>
+            <div class="hero__actions">
+              <button class="btn btn--crimson" data-open-contact>Collaborate · Fundraise · Volunteer</button>
+              <a class="btn btn--ghost" href="#projects">See our projects</a>
+            </div>
+          </div>
+        </div>
+        <a href="#mission" class="hero__scroll" aria-label="Scroll to mission"><span></span>Scroll</a>
+      </section>
+
+      <!-- MARQUEE -->
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee__track">
+          <span>Education</span><i>✦</i><span>Menstrual health</span><i>✦</i><span>Digital literacy</span><i>✦</i><span>The spirit of giving</span><i>✦</i><span>Summer camps</span><i>✦</i>
+          <span>Education</span><i>✦</i><span>Menstrual health</span><i>✦</i><span>Digital literacy</span><i>✦</i><span>The spirit of giving</span><i>✦</i><span>Summer camps</span><i>✦</i>
+        </div>
+      </div>
+
+      <!-- MISSION -->
+      <section class="mission" id="mission">
+        <p class="eyebrow eyebrow--dark">( Our mission )</p>
+        <p class="mission__statement" data-reveal-words>
+          Small acts. Big smiles. We show up at government schools and communities across Bangalore — sharing stationery, donating technology, breaking the silence around periods and running camps where smiles grow and memories remain.
+        </p>
+        <div class="pillars">
+          <article class="pillar">
+            <span class="pillar__num">01</span>
+            <h3>Education for all</h3>
+            <p>Stationery drives, learning camps and classroom support for children in government schools.</p>
+          </article>
+          <article class="pillar">
+            <span class="pillar__num">02</span>
+            <h3>Health &amp; dignity</h3>
+            <p>Menstrual awareness sessions and myth-busting campaigns that normalise conversations about periods.</p>
+          </article>
+          <article class="pillar">
+            <span class="pillar__num">03</span>
+            <h3>Digital empowerment</h3>
+            <p>Getting technology into classrooms so every child can build the skills to thrive in a digital world.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- PROJECTS (3D orbit) -->
+      <section class="projects" id="projects">
+        <div class="projects__pin" id="projectsPin">
+          <canvas class="projects__canvas" id="orbitCanvas" aria-hidden="true"></canvas>
+          <div class="projects__head">
+            <p class="eyebrow">( Projects in orbit )</p>
+            <h2>Our work, <br /><em>constellated.</em></h2>
+          </div>
+          <div class="projects__detail" id="projectDetail" aria-live="polite">
+            <p class="projects__count"><span id="pCount">01</span> / <span id="pTotal">06</span></p>
+            <p class="projects__meta" id="pMeta"></p>
+            <h3 class="projects__title" id="pTitle"></h3>
+            <p class="projects__desc" id="pDesc"></p>
+            <a class="projects__link" id="pLink" href="#" target="_blank" rel="noopener">View on Instagram ↗</a>
+          </div>
+          <div class="projects__progress"><span id="pBar"></span></div>
+          <p class="projects__hint">Scroll or drag to orbit</p>
+        </div>
+        <!-- Fallback / accessible list, also used when WebGL is unavailable -->
+        <ol class="projects__list" id="projectsList"></ol>
+      </section>
+
+      <!-- MOMENTS -->
+      <section class="moments" id="moments">
+        <div class="moments__head">
+          <p class="eyebrow eyebrow--dark">( Moments )</p>
+          <h2>Exploring, learning<br />&amp; <em>laughing together.</em></h2>
+          <p class="moments__quip">We’re an NGO — of course grammar isn’t our strong suit. Kindness, though? We’re fluent.</p>
+        </div>
+        <div class="strip" id="strip">
+          <div class="strip__track" id="stripTrack"></div>
+        </div>
+      </section>
+
+      <!-- GET INVOLVED -->
+      <section class="involved" id="involved">
+        <p class="eyebrow">( Get involved )</p>
+        <h2 class="involved__title">Your energy <em>counts.</em></h2>
+        <div class="ways">
+          <button class="way" data-open-contact="collab">
+            <span class="way__num">01</span>
+            <span class="way__name">Collaborate</span>
+            <span class="way__desc">Schools, NGOs, brands and creators — let’s build the next project together.</span>
+            <span class="way__arrow">→</span>
+          </button>
+          <button class="way" data-open-contact="fundraise">
+            <span class="way__num">02</span>
+            <span class="way__name">Fundraise</span>
+            <span class="way__desc">Sponsor a stationery drive, a laptop, or a whole summer camp.</span>
+            <span class="way__arrow">→</span>
+          </button>
+          <button class="way" data-open-contact="volunteer">
+            <span class="way__num">03</span>
+            <span class="way__name">Volunteer</span>
+            <span class="way__desc">Join us on the ground and create magical memories with young adventurers.</span>
+            <span class="way__arrow">→</span>
+          </button>
+        </div>
+        <div class="involved__contact">
+          <p>Or just call us</p>
+          <a href="tel:+916360771754" class="involved__phone">+91 63607 71754</a>
+        </div>
+      </section>
+
+      <section class="partners">
+        <p class="eyebrow eyebrow--dark">( In good company )</p>
+        <ul class="partners__list">
+          <li><a href="https://www.instagram.com/_ektara._/" target="_blank" rel="noopener">Ektara</a></li>
+          <li><span>Advaya Foundation</span></li>
+          <li><span>Government schools of Bangalore</span></li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer__big">Celestial</div>
+      <div class="footer__row">
+        <p>The Celestial Foundation<br />Registered Non-Profit · Education &amp; Social Development<br />📍 Bangalore, India</p>
+        <ul>
+          <li><a href="https://www.instagram.com/thecelestialfoundation/" target="_blank" rel="noopener">Instagram ↗</a></li>
+          <li><a href="https://linktr.ee/TheCelestialFoundation" target="_blank" rel="noopener">Linktree ↗</a></li>
+          <li><a href="https://docs.google.com/forms/d/e/1FAIpQLSdqEvn8XoHeVg3XUgB2bGfceg8JpSPV9g9FFQa4hlWi7Ftjxg/viewform?usp=sf_link" target="_blank" rel="noopener">Volunteer form ↗</a></li>
+          <li><a href="tel:+916360771754">+91 63607 71754</a></li>
+        </ul>
+      </div>
+      <p class="footer__small">© <span id="year"></span> The Celestial Foundation. Made with love under the same sky.</p>
+    </footer>
+
+    <!-- Floating contact -->
+    <button class="fab" data-open-contact aria-label="Contact us">
+      <span class="fab__ring"></span>
+      <span class="fab__text">Contact us</span>
+    </button>
+
+    <!-- Contact dialog -->
+    <dialog class="contact" id="contact" aria-labelledby="contactTitle">
+      <button class="contact__close" id="contactClose" aria-label="Close">✕</button>
+      <p class="eyebrow eyebrow--dark">( Say hello )</p>
+      <h2 id="contactTitle">How would you like to <em>help?</em></h2>
+      <div class="contact__tabs" role="tablist">
+        <button role="tab" data-intent="collab" aria-selected="true">Collaborate</button>
+        <button role="tab" data-intent="fundraise" aria-selected="false">Fundraise</button>
+        <button role="tab" data-intent="volunteer" aria-selected="false">Volunteer</button>
+      </div>
+      <p class="contact__blurb" id="contactBlurb"></p>
+      <div class="contact__actions">
+        <a class="btn btn--crimson" id="contactWa" href="#" target="_blank" rel="noopener">Message on WhatsApp</a>
+        <a class="btn btn--outline" href="tel:+916360771754">Call +91 63607 71754</a>
+      </div>
+      <a class="contact__form" id="contactForm" href="https://docs.google.com/forms/d/e/1FAIpQLSdqEvn8XoHeVg3XUgB2bGfceg8JpSPV9g9FFQa4hlWi7Ftjxg/viewform?usp=sf_link" target="_blank" rel="noopener">Prefer a form? Fill the volunteer enrollment form ↗</a>
+    </dialog>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
