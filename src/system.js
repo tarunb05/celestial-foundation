@@ -212,11 +212,13 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
   // The layout gives a base viewpoint; dragging spins it around the centre (yaw) and tilts it
   // between almost top-down and almost edge-on (pitch), with a little momentum after release.
   const baseHome = new THREE.Vector3()
-  const view = { yaw: 0, pitch: 0, vyaw: 0, vpitch: 0 }
+  const view = { yaw: 0, pitch: 0, vyaw: 0, vpitch: 0, zoom: 1, zoomT: 1 }
+  const ZOOM_IN = 0.42, ZOOM_OUT = 1.45 // camera distance multipliers
   let dragging = false, dragMoved = 0, lastX = 0, lastY = 0, suppressClick = false, camTween = false
   function computeHome() {
-    const R = baseHome.length()
-    const el0 = Math.asin(baseHome.y / R)
+    const R0 = baseHome.length()
+    const R = R0 * view.zoom
+    const el0 = Math.asin(baseHome.y / R0)
     view.pitch = THREE.MathUtils.clamp(view.pitch, 0.12 - el0, 1.48 - el0)
     const el = el0 + view.pitch
     const az = Math.atan2(baseHome.x, baseHome.z) + view.yaw
@@ -249,6 +251,23 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
     canvas.classList.remove('is-dragging')
     if (dragMoved > 6) suppressClick = true // a drag is not a click on a planet
   }
+  // scroll / trackpad to zoom. Scroll up zooms in, down zooms out. Once a limit is reached the
+  // wheel goes back to scrolling the page, so the section never traps you.
+  const zoomEl = canvas.parentElement || canvas // the whole section, so labels don't block zooming
+  zoomEl.addEventListener(
+    'wheel',
+    (e) => {
+      zoomEl.removeAttribute('data-lenis-prevent-wheel')
+      if (focused !== null) return
+      const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY
+      const next = THREE.MathUtils.clamp(view.zoomT * Math.exp(dy * (e.ctrlKey ? 0.01 : 0.0016)), ZOOM_IN, ZOOM_OUT)
+      if (Math.abs(next - view.zoomT) < 1e-4) return // at the limit: let the page scroll
+      view.zoomT = next
+      e.preventDefault()
+      zoomEl.setAttribute('data-lenis-prevent-wheel', '') // keep Lenis from also scrolling the page
+    },
+    { passive: false }
+  )
   canvas.addEventListener('pointerup', endDrag)
   canvas.addEventListener('pointercancel', endDrag)
 
@@ -402,6 +421,7 @@ export function initSystem(canvas, projects, { labelsEl, centerLabel, reduced, o
         view.vyaw *= 0.94
         view.vpitch *= 0.9
       }
+      view.zoom += (view.zoomT - view.zoom) * (reduced ? 1 : 0.12)
       computeHome()
       cam.pos.copy(home.pos)
     }
