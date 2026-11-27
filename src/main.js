@@ -7,6 +7,7 @@ import { projects, intents, PHONE } from './data.js'
 import { initHero } from './hero.js'
 import { initSystem } from './system.js'
 import { initAsteroidCursor } from './cursor.js'
+import { initGalaxy } from './galaxy.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -52,6 +53,8 @@ $$('a[href^="#"]').forEach((a) =>
   const countEl = $('#loaderCount')
   const fillEl = $('#loaderFill')
   gsap.set('#loaderName span', { yPercent: 110 })
+  const galaxy = initGalaxy($('#loaderSky'), { reduced, center: $('#loaderMoon') })
+  gsap.fromTo(galaxy.state, { zoom: 0.6 }, { zoom: 1, duration: 2.2, ease: 'power3.out' }) // galaxy unfurls while loading
   const ready = Promise.all([
     document.fonts.ready,
     new Promise((r) => (document.readyState === 'complete' ? r() : window.addEventListener('load', r, { once: true }))),
@@ -83,11 +86,12 @@ $$('a[href^="#"]').forEach((a) =>
     const tl = gsap.timeline()
     tl.to('#loaderCountWrap', { opacity: 0, y: 10, duration: 0.3 })
       .to('#loaderMoon', { scale: 1.9, duration: 0.9, ease: 'expo.inOut' }, '<')
+      .to(galaxy.state, { zoom: 1.35, duration: 1.8, ease: 'expo.inOut' }, '<') // the galaxy surges in with the logo
       .fromTo('#loaderLogo', { opacity: 0, scale: 0.6, rotate: -25 }, { opacity: 1, scale: 1, rotate: 0, duration: 0.9, ease: 'expo.out' }, '-=0.45')
       .to('#loaderFill', { opacity: 0, duration: 0.4 }, '<0.2')
       .fromTo('#loaderName span', { yPercent: 110 }, { yPercent: 0, duration: 0.8, ease: 'expo.out' }, '<')
       .to('#loader', { yPercent: -100, duration: 1.1, ease: 'expo.inOut', delay: reduced ? 0 : 0.7 })
-      .set('#loader', { display: 'none' })
+      .set('#loader', { display: 'none', onComplete: () => galaxy.stop() })
       .from('.hero__title .line > span', { yPercent: 110, duration: 1.2, stagger: 0.12, ease: 'expo.out' }, '-=0.5')
       .from('.hero__eyebrow, .hero__sub, .hero__actions, .hero__scroll, .nav', { opacity: 0, y: 20, duration: 0.9, stagger: 0.08, ease: 'power3.out', clearProps: 'opacity,transform' }, '-=0.9')
     if (reduced) tl.progress(1)

@@ -99,6 +99,9 @@ html.has-asteroid * { cursor: none !important; }
   align-content: center;
   gap: 22px;
 }
+.loader { background: radial-gradient(120% 90% at 50% 50%, #174d64 0%, var(--teal) 45%, var(--night) 100%); }
+.loader__sky { position: absolute; inset: 0; width: 100%; height: 100%; }
+.loader > :not(.loader__sky) { position: relative; z-index: 1; }
 .loader__moon {
   width: 92px;
   height: 92px;
