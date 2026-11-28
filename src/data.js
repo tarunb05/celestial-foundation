@@ -89,7 +89,7 @@ export const projects = [
       'Encouraged kindness, empathy and the joy of giving',
     ],
     impact: [],
-    gallery: [], // photos to be added: daan-utsav-sandwich-seva-*.jpg
+    gallery: ['/img/daan-utsav-sandwich-seva-team.jpg', '/img/daan-utsav-sandwich-seva-sharing.jpg', '/img/daan-utsav-sandwich-seva-giving.jpg'],
     planet: { a: '#22396f', b: '#b9c8ee', c: '#010736', bands: 1, size: 0.44 },
   },
 
