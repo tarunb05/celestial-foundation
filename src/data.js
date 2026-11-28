@@ -93,13 +93,31 @@ export const projects = [
     planet: { a: '#22396f', b: '#b9c8ee', c: '#010736', bands: 1, size: 0.44 },
   },
 
+  {
+    title: 'Daan Utsav – Day 3',
+    date: '',
+    place: 'Spreading Joy Through Giving',
+    partner: 'Celestial × EuroKids',
+    desc: 'We concluded our Daan Utsav collaboration with EuroKids by extending support to two orphanages. At the first, home to young girls in need of care and protection, we donated approximately 50+ kg of groceries. We were warmly welcomed with beautiful choir performances and a heartfelt handmade thank-you note from the children, making the visit truly memorable. At the second orphanage, which houses children aged 6–10, we contributed 50+ kg of groceries along with a monetary donation to support their needs. Through these visits, we hoped to make a meaningful difference while spreading compassion, care and the spirit of giving.',
+    did: [
+      'Donated 50+ kg of groceries to a home for young girls in need of care and protection',
+      'Were welcomed with choir performances and a handmade thank-you note',
+      'Contributed 50+ kg of groceries and a monetary donation to a home for children aged 6–10',
+    ],
+    impact: [
+      { value: '100+ kg', label: 'groceries donated' },
+      { value: '2', label: 'orphanages supported' },
+    ],
+    gallery: ['/img/daan-utsav-day3-orphanage-visit-1.jpg', '/img/daan-utsav-day3-orphanage-visit-2.jpg', '/img/daan-utsav-day3-orphanage-visit-3.jpg'],
+    planet: { a: '#f2d58a', b: '#fcf1d0', c: '#22396f', bands: 0, size: 0.42 },
+  },
+
   // ---- Placeholders: empty orbits, filled in one by one ----
   ...[
-    { a: '#f2d58a', b: '#fcf1d0', c: '#22396f', bands: 0, size: 0.34 },
     { a: '#2a4a8f', b: '#a9c0f0', c: '#0d1c42', bands: 1, size: 0.46 },
     { a: '#c8a65e', b: '#f6e3b0', c: '#0d1c42', bands: 0, size: 0.38 },
     { a: '#5b6fae', b: '#dfe6ff', c: '#010736', bands: 1, size: 0.5 },
-  ].map((planet, k) => placeholder(`Project ${String(6 + k).padStart(2, '0')}`, planet)),
+  ].map((planet, k) => placeholder(`Project ${String(7 + k).padStart(2, '0')}`, planet)),
   // tiny moons for smaller projects (moonOf = index of the planet they circle)
   placeholder('Small project', { a: '#a9c0f0', b: '#fcf1d0', c: '#22396f', bands: 0, size: 0.13 }, 0),
   placeholder('Small project', { a: '#f2d58a', b: '#fcf1d0', c: '#22396f', bands: 0, size: 0.12 }, 3),
