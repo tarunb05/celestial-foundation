@@ -464,6 +464,13 @@ html.has-asteroid * { cursor: none !important; }
   border: 1px solid rgb(252 241 208 / 0.3);
   margin-bottom: 34px;
   transition: background 0.3s, color 0.3s;
+  /* stays in view while the project details scroll (just under the fixed nav on desktop) */
+  position: sticky;
+  top: calc(84px - 110px); /* the offset counts from inside the panel's 110px top padding: lands 84px from the top */
+  z-index: 5;
+  background: rgb(1 7 54 / 0.82);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px -12px rgb(0 0 0 / 0.6);
 }
 .planet__back:hover { background: var(--cream); color: var(--teal); }
 .planet__eyebrow { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--pink); }
@@ -691,7 +698,7 @@ html.has-asteroid * { cursor: none !important; }
     transition: opacity 0.5s, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s 0.5s;
   }
   .planet.is-open { transform: none; transition: opacity 0.5s, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
-  .planet__back { margin-bottom: 22px; }
+  .planet__back { margin-bottom: 22px; top: calc(10px - 28px); } /* bottom sheet (28px top padding): stick 10px from its top */
   .stat__num { font-size: 38px; }
 }
 @media (max-width: 520px) {
