@@ -55,15 +55,51 @@ export const projects = [
     planet: { a: '#1b3a8a', b: '#f2d58a', c: '#fcf1d0', bands: 1, size: 0.46 },
   },
 
+  {
+    title: 'Daan Utsav – Day 1',
+    date: '',
+    place: 'Cleanliness Walkathon, BDS Nagar',
+    partner: 'Celestial × EuroKids',
+    desc: 'As part of Daan Utsav, we collaborated with EuroKids to celebrate gratitude and community responsibility. A key highlight was organizing a Cleanliness Walkathon in BDS Nagar, where children and staff came together with gloves, masks and broomsticks to promote cleanliness and take an active step towards a cleaner neighbourhood. We also spread appreciation to our local community heroes by distributing thank-you cards, smiley stickers and fresh fruits, making the day a meaningful celebration of kindness and collective action.',
+    did: [
+      'Organised a Cleanliness Walkathon in BDS Nagar with EuroKids',
+      'Children and staff cleaned up together with gloves, masks and broomsticks',
+      'Thanked local community heroes with cards, smiley stickers and fresh fruit',
+    ],
+    impact: [],
+    gallery: [
+      '/img/daan-utsav-eurokids-cleanup.jpg',
+      '/img/daan-utsav-eurokids-earth-sign.jpg',
+      '/img/daan-utsav-eurokids-smiles.jpg',
+      '/img/daan-utsav-eurokids-thank-you-card.jpg',
+      '/img/daan-utsav-eurokids-shop-visit.jpg',
+    ],
+    planet: { a: '#e8d6a6', b: '#fcf1d0', c: '#22396f', bands: 1, size: 0.6, ring: true },
+  },
+
+  {
+    title: 'Daan Utsav – Day 2',
+    date: '',
+    place: 'Sandwich Seva, K. Narayanapura',
+    partner: 'Celestial × EuroKids',
+    desc: 'Continuing our collaboration with EuroKids, Day 2 of Daan Utsav celebrated the spirit of sharing through Sandwich Seva. Our young changemakers prepared fresh sandwiches with love and distributed them to people in need across K. Narayanapura. The initiative encouraged children to embrace kindness, empathy and the joy of giving, proving that even the smallest hands can make a meaningful difference.',
+    did: [
+      'Young changemakers prepared fresh sandwiches with love',
+      'Distributed them to people in need across K. Narayanapura',
+      'Encouraged kindness, empathy and the joy of giving',
+    ],
+    impact: [],
+    gallery: [], // photos to be added: daan-utsav-sandwich-seva-*.jpg
+    planet: { a: '#22396f', b: '#b9c8ee', c: '#010736', bands: 1, size: 0.44 },
+  },
+
   // ---- Placeholders: empty orbits, filled in one by one ----
   ...[
-    { a: '#e8d6a6', b: '#fcf1d0', c: '#22396f', bands: 1, size: 0.6, ring: true },
-    { a: '#22396f', b: '#b9c8ee', c: '#010736', bands: 1, size: 0.4 },
     { a: '#f2d58a', b: '#fcf1d0', c: '#22396f', bands: 0, size: 0.34 },
     { a: '#2a4a8f', b: '#a9c0f0', c: '#0d1c42', bands: 1, size: 0.46 },
     { a: '#c8a65e', b: '#f6e3b0', c: '#0d1c42', bands: 0, size: 0.38 },
     { a: '#5b6fae', b: '#dfe6ff', c: '#010736', bands: 1, size: 0.5 },
-  ].map((planet, k) => placeholder(`Project ${String(4 + k).padStart(2, '0')}`, planet)),
+  ].map((planet, k) => placeholder(`Project ${String(6 + k).padStart(2, '0')}`, planet)),
   // tiny moons for smaller projects (moonOf = index of the planet they circle)
   placeholder('Small project', { a: '#a9c0f0', b: '#fcf1d0', c: '#22396f', bands: 0, size: 0.13 }, 0),
   placeholder('Small project', { a: '#f2d58a', b: '#fcf1d0', c: '#22396f', bands: 0, size: 0.12 }, 3),

@@ -502,7 +502,8 @@ html.has-asteroid * { cursor: none !important; }
 .planet__gallery[data-count='1'] { grid-template-columns: 1fr; }
 .planet__gallery figure { margin: 0; border-radius: 14px; overflow: hidden; aspect-ratio: 4 / 5; }
 .planet__gallery[data-count='1'] figure { aspect-ratio: 4 / 3; }
-.planet__gallery[data-count='3'] figure:first-child { grid-column: 1 / -1; aspect-ratio: 4 / 3; } /* odd count: lead photo full width */
+.planet__gallery[data-odd='1'] figure:first-child { grid-column: 1 / -1; aspect-ratio: 4 / 3; } /* odd count: lead photo full width */
+.planet__impact:empty { display: none; }
 .planet__gallery img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
 .planet__gallery img { pointer-events: none; user-select: none; }
 .planet--placeholder .planet__link, .planet--placeholder .planet__h, .planet--placeholder .planet__did, .planet--placeholder .planet__impact { display: none; }

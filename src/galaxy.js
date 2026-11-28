@@ -83,8 +83,9 @@ export function initGalaxy(canvas, { reduced, center }) {
   const OVER = 1.8 // buffer is larger than the screen so it can drift and zoom out
 
   function resize() {
-    W = window.innerWidth
-    H = window.innerHeight
+    // a window can briefly report 0×0 (background tab, hidden pane): never paint a 0-size sky
+    W = Math.max(1, window.innerWidth || document.documentElement.clientWidth || 1)
+    H = Math.max(1, window.innerHeight || document.documentElement.clientHeight || 1)
     canvas.width = W * dpr
     canvas.height = H * dpr
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
@@ -129,6 +130,8 @@ export function initGalaxy(canvas, { reduced, center }) {
 
   function frame() {
     if (!running) return
+    // the window got a real size after a 0×0 start: repaint the sky at the proper size
+    if (W < 2 && window.innerWidth > 1) resize()
     requestAnimationFrame(frame)
     time += 0.016
     if (!reduced) state.rot += 0.00012

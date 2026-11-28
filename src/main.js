@@ -59,7 +59,14 @@ let heroApi = null // set once the hero scene exists; the loader exit flies its 
   const countEl = $('#loaderCount')
   const fillEl = $('#loaderFill')
   gsap.set('#loaderName span', { yPercent: 110 })
-  const galaxy = initGalaxy($('#loaderSky'), { reduced, center: $('#loaderMoon') })
+  // the starry sky is decoration: if it ever fails, the loader (and the site) must still carry on
+  let galaxy
+  try {
+    galaxy = initGalaxy($('#loaderSky'), { reduced, center: $('#loaderMoon') })
+  } catch (err) {
+    console.warn('Loader sky failed, continuing without it', err)
+    galaxy = { state: { zoom: 1, rot: 0, warp: 0 }, stop() {} }
+  }
   gsap.fromTo(galaxy.state, { zoom: 0.7 }, { zoom: 0.85, duration: 2.2, ease: 'power3.out' }) // sky drifts in while loading
   // A reload in the same browser session gets a quick intro; the first visit gets the full (but brisker) show.
   let seen = false
@@ -184,6 +191,7 @@ function fillPanel(i) {
   $('#plDid').innerHTML = p.did.map((d) => `<li>${d}</li>`).join('')
   $('#plGallery').innerHTML = p.gallery.map((src) => `<figure><img src="${src}" alt="${p.title}" loading="lazy" draggable="false" /></figure>`).join('') // photos are not links
   $('#plGallery').dataset.count = p.gallery.length
+  $('#plGallery').dataset.odd = p.gallery.length > 1 && p.gallery.length % 2 ? '1' : '0'
   $('#plLink').href = p.link || '#'
   $('#plLink').hidden = !p.link // no Instagram post yet → no button
   // placeholder orbits: no photos or Instagram link yet, just an invitation to get in touch
